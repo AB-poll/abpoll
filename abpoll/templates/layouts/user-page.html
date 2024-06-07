@@ -1,0 +1,223 @@
+{% extends 'layouts/base-2.html' %}
+{% import 'macros/sidebar.html' as sidebar %}
+{% block title %}{{User.display_username()}} / ABpoll{% endblock %}
+{% block description %}{% if User.description != None %}{{User.description}}{% else %}Follow {{User.display_username()}}, and keep up with the community.{% endif %}{% endblock %}
+{% block featured_image %}{{User.retrieve_profile_picture()}}{% endblock %}
+{% block header %}
+<meta name="revisit-after" content="1 days">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tagify/4.9.8/jQuery.tagify.min.js" integrity="sha512-/iKW064UdZxSuXUCuiLfwIcuzjQBM/OmCSsGfe7wJI72oQP1dsVTSkKmzYMurpXNJyNMFDiDBkpgZAbk4alUUA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tagify/4.9.8/tagify.css" integrity="sha512-3TQTxe+kPDiA+h9hlIm4ydUdtreW8fVei75UUVmBioKA+prR2aYZqSDsCOBqGBmXJ4JSXKyj3bMHD1VAFDGyTA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<style>
+/*********************************/
+/*       Hide ScrollBar     */
+/*===============================*/
+html {
+    overflow: scroll;
+    overflow-x: hidden;
+}
+::-webkit-scrollbar {
+    width: 0;  /* Remove scrollbar space */
+    background: transparent;  /* Optional: just make scrollbar invisible */
+}
+/* Optional: show position indicator in red */
+::-webkit-scrollbar-thumb {
+    background: #FF0000;
+}
+</style>
+{%endblock %}
+{% block content %}
+<!-- Start profile header -->
+<section class="section">
+    <div class="container mt-4-on-sm">
+        <div class="row justify-content-center">
+            <div class="col-xl-5 col-lg-6 col-md-7 col-sm-12 order-md-2 order-lg-2 order-1">
+                <div class="card public-profile border-0 rounded">
+                    <div class="card-body pb-0">
+                        <div class="row align-items-center">
+                            <div class="col-12">
+                                <div class="text-center bg-white rounded">
+                                    <img src="{{User.retrieve_profile_picture()}}" class="rounded-circle shadow avatar avatar-md-md" alt="">
+                                    <h5 class="mt-3" id="username">{{User.display_username()}}</h5>
+                                    {% if User.description != None %}<p class="text-muted">{{User.description}}</p>{% endif %}
+                                    <ul class="list-unstyled mb-3 mt-3">
+                                        {% if User.social_1_handle != None %}<li class="list-inline-item me-2"><a target="_blank" href="{{User.social_1_link}}" class="text-muted" title="{{User.social_1_option}}"><span class="iconify fea icon-sm me-2" data-feather="{{User.social_1_option}}" data-inline="false"></span>
+                                        {{User.social_1_handle}}</a></li>{% endif %}
+                                        {% if User.social_2_handle != None %}<li class="list-inline-item"><a target="_blank" href="{{User.social_2_link}}" class="text-muted" title="{{User.social_2_option}}"><span class="iconify fea icon-sm me-2" data-feather="{{User.social_2_option}}" data-inline="false"></span>
+                                        {{User.social_2_handle}}</a></li>{% endif %}
+                                        {% if User.location != None %}<li class="list-inline-item"><a href="javascript:void(0)" class="text-muted" title="Location"><span class="iconify fea icon-sm me-2" data-feather="map-pin" data-inline="false"></span>
+                                        {{User.location}}</a></li>{% endif %}
+                                    </ul><!--end icon-->
+
+                                    <ul class="list-unstyled mb-0 mt-2" >
+                                        {% if User == current_user %}<li class="list-inline-item"><a class="btn btn-outline-light searchbtn btn-pills" data-bs-target="#EditForm" data-bs-toggle="modal">Edit Profile</a></li>
+                                        {% else %}
+                                        {% if current_user.is_active %}
+                                            {% if current_user.if_follower_of(User) %}
+                                                <li class="list-inline-item ms-2"><div onclick="followFunction(this, '{{User.username}}')" class="btn btn-outline-light searchbtn btn-pills">Following</div></li>
+                                            {% else %}
+                                                <li class="list-inline-item ms-2"><div onclick="followFunction(this, '{{User.username}}')" class="btn btn-dark searchbtn btn-pills">Follow</div></li>
+                                            {%endif%}
+                                        {% else %}
+                                        <li class="list-inline-item ms-2"><div onclick="followFunction(this, '{{User.username}}')" class="btn btn-dark searchbtn btn-pills">Follow</div></li>
+                                        {% endif %}
+                                        {% endif %}
+                                        {% if User.email_verified %}
+                                        <li class="list-inline-item ms-2"><a href="{{url_for('message.message_username', username=User.username)}}" class="btn btn-icon btn-pills btn-light"><i class="uil uil-message rounded-circle"></i></a></li>
+                                        {% endif %}
+                                    </ul><!--end icon-->
+
+
+                                    <!--  Following row start  -->
+                                    <div class="row mt-4">
+                                        <div class="col-6 text-center">
+                                            <h5 class="mb-0 "><span class="abnum" data-abbreviate="{{User.coins or 50 }}">{{User.coins or 50 }}</span><i class="uil uil-coins ms-1 text-warning"></i></h5>
+                                            <p class="text-muted mb-0">Points</p>
+                                        </div><!--end col-->
+                                        <div data-bs-toggle="modal" data-bs-target="#FollowersList" class="cursor-pointer col-6 text-center">
+                                            <h5 id="direct-click" class="mb-0 abnum follower-count" data-abbreviate="{{User.followers.count() }}">{{User.followers.count() }}</h5>
+                                            <p class="text-muted mb-0">Followers</p>
+                                        </div><!--end col-->
+                                    </div>
+                                    <!--end row-->
+                                </div>
+                            </div>
+                        </div><!--end row-->
+
+
+                        <a onclick='triggerShare("https://abpoll.com{{ url_for(request.endpoint, **request.view_args) }}", "{{User.display_username()}}", {{User.description | tojson }})' class="share-button btn position-absolute text-muted m-0 p-0" title="Share this article">
+                            <i class="uil uil-share-alt h5"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                {% block post_content %}
+                {% endblock %}
+
+            </div><!--end col-->
+
+            {{ sidebar.users() }}
+        </div>
+    </div>
+</section>
+
+<!-- End profile header -->
+
+<!-- Modal Followers Start -->
+<div class="modal fade" id="FollowersList" tabindex="-1" aria-labelledby="FollowersList-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded shadow border-0">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">Followers</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-footer border-0 px-0">
+                <div class="table-responsive bg-white pb-2 rounded box-shadow">
+                    <table class="table mb-0 table-center">
+                        <tbody>
+                            {% for person in User.followers %}
+                            <tr onclick="window.location='/u/{{User.display_username(user_id=person.follower_id)}}';" class="cursor-pointer">
+                                <td scope="row"><img src="{{User.retrieve_profile_picture(user_id=person.follower_id)}}" class="img-fluid avatar avatar-md-sm rounded-circle shadow" alt="img"><span class="ps-3">{{User.display_username(user_id=person.follower_id)}}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Followers End -->
+
+{% if current_user.username == User.username %}
+<!-- Edit Pop Up Start -->
+<div class="modal fade" id="EditForm" tabindex="-1" aria-labelledby="EditFormLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded shadow border-0">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="LoginForm-title">Edit Page</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/edit_user_page" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <div class="modal-body">
+                    <label class="form-label">Post Default Background <small class="text-muted">(1080 x 1350 px)</small></label>
+                    <div class="form-icon position-relative">
+                        <input type="file" accept=".jpeg, .jpg, .jfif, .pjpeg, .pjp, .png, .gif" name="background" class="form-control ps-2">
+                    </div>
+                    <br>
+                    <label class="form-label">Short Bio <span class="text-danger">*</span></label>
+                    <div class="form-icon position-relative">
+                        <i data-feather="mail" class="fea icon-sm icons"></i>
+                        <textarea name="description" rows="3" class="form-control ps-5" placeholder="Short bio description" maxlength="160">{% if current_user.description != None %}{{current_user.description}}{% endif %}</textarea>
+                        <div class="invalid-feedback">
+                            Please keep the length to 160 characters
+                        </div>
+                    </div>
+                    <br>
+                    <label class="form-label">Socials</label>
+                    <div class="form-icon position-relative">
+                        <select id="SocialChoice1" name="social_1_option" class="form-select form-control col-md-6" aria-label="Default select Twitter">
+                          <option data-rate="Twitter username" value="Twitter" {% if User.social_1_option == 'twitter' %} selected=""{% endif %} {% if User.social_1_option == None %} selected=""{% endif %}>Twitter</option>
+                          <option data-rate="Instagram username" value="Instagram" {% if User.social_1_option == 'instagram' %} selected=""{% endif %}>Instagram</option>
+                          <option data-rate="Twitch username" value="Twitch" {% if User.social_1_option == 'twitch' %} selected=""{% endif %}>Twitch</option>
+                          <option data-rate="Channel link" value="Youtube" {% if User.social_1_option == 'youtube' %} selected=""{% endif %}>Youtube</option>
+                          <option data-rate="Website link" value="Website" {% if User.social_1_option == 'globe' %} selected=""{% endif %}>Website</option>
+
+                        </select>
+
+                        <input type="text" id="social_at1" name="social_1" class="form-control col-md-6" placeholder="Twitter username" {% if User.social_1_handle != None %} {% if User.social_1_option == 'globe' or User.social_1_option == 'youtube' %} value="{{User.social_1_link}}" {% endif %} {% if User.social_1_option != 'website' or User.social_1_option != 'youtube' %} value="{{User.social_1_handle}}" {% endif %} {% endif %}>
+                    </div>
+                    <br>
+                    <div class="form-icon position-relative">
+                        <select id="SocialChoice2" name="social_2_option" class="form-select form-control col-md-6" aria-label="Default select Instagram">
+                          <option data-rate="Twitter username" value="Twitter" {% if User.social_2_option == 'twitter' %} selected=""{% endif %}>Twitter</option>
+                          <option data-rate="Instagram username" value="Instagram" {% if User.social_2_option == 'instagram' %} selected=""{% endif %} {% if User.social_2_option == None %} selected=""{% endif %}>Instagram</option>
+                          <option data-rate="Twitch username" value="Twitch" {% if User.social_2_option == 'twitch' %} selected=""{% endif %}>Twitch</option>
+                          <option data-rate="Channel link" value="Youtube" {% if User.social_2_option == 'youtube' %} selected=""{% endif %}>Youtube</option>
+                          <option data-rate="Website link" value="Website" {% if User.social_2_option == 'globe' %} selected=""{% endif %}>Website</option>
+
+                        </select>
+
+                        <input maxlength="30" type="text" id="social_at2" name="social_2" class="form-control col-md-6" {% if User.social_2_handle != None %}  {% if User.social_2_option == 'globe' or User.social_2_option == 'youtube' %} value="{{User.social_2_link}}" {% endif %} {% if User.social_2_option != 'website' or User.social_2_option != 'youtube' %} value="{{User.social_2_handle}}" {% endif %} {% endif %} placeholder="Instagram username">
+
+                    </div>
+                    <br>
+                    <label class="form-label">Location</label>
+                    <div class="form-icon position-relative">
+                        <input type="text" maxlength="30" name="location" class="form-control ps-2" {% if current_user.location != None %}value="{{current_user.location}}" {% endif %}>
+                        <div class="invalid-feedback">
+                            Please keep the length to 30 characters
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <input type="submit" class="btn btn-primary btn-pills" value="Save changes"/>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Edit Pop Up End -->
+{% endif %}
+
+<!-- javascript -->
+<script>
+$("#SocialChoice1").change(function(){
+    $("#social_at1").attr("placeholder", $(this).find(":selected").data("rate"));
+})
+</script>
+<script>
+$("#SocialChoice2").change(function(){
+    $("#social_at2").attr("placeholder", $(this).find(":selected").data("rate"));
+})
+</script>
+
+{% endblock %}
+{% block footer %}
+{% endblock %}
+
+
+
+
+

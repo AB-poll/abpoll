@@ -1,0 +1,68 @@
+{
+  "name": "ABpoll",
+  "short_name": "ABpoll",
+  "startUrl": "/",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "default_locale": "en",
+  "manifest_version": 2,
+  "offline_enabled": true,
+  "version": "0.2",
+  "permissions": ["webNavigation", "cookies", "notifications"],
+  "categories": ["poll", "trivia", "social", "statistics", "debate", "pwa"],
+  "orientation": "portrait",
+  "description": "We aim to use the inherent appeal of participating in pools for gathering insights to design better connections and foster relationships.",
+  "icons": [{
+      "src": "https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/45686c7e-044b-4150-c3b2-c1a7bb4e7a00/public",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/c51260da-109a-4d79-345e-643cecdd9d00/public",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/6bdf82e3-232b-4c83-46a5-99bd1707b000/public",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/977f8405-0503-4ceb-8a78-8d77d2024400/public",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/a31b12c5-3c0b-4634-6caa-e3c33e954000/public",
+      "sizes": "152x152",
+      "type": "image/png"
+    },
+    {
+      "src": "https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/35dc2b41-5daa-4243-ceea-aea792570300/public",
+      "sizes": "167x167",
+      "type": "image/png"
+    },
+    {
+      "src": "https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/5f2a2543-1741-46d6-4893-a8d9e5200b00/public",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/b0e732d5-767c-4fc6-5971-5cb6ee574100/public",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/1c827187-7410-4947-2416-e2245a957300/public",
+      "sizes": "384x384",
+      "type": "image/png"
+    },
+    {
+      "src": "https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/ade41e83-ce65-4c09-f161-9ab13ddf5100/public",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

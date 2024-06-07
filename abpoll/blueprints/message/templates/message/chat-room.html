@@ -1,0 +1,76 @@
+{% extends 'layouts/base-2.html' %}
+{% block title %}Message / ABpoll{% endblock %}
+{% block description %}Change your mailing preferences here.{% endblock %}
+{% block header %}
+<meta name="keywords" content="message, friends, find-people, polls, trivia, community." />
+<meta property="og:image" content="https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/939d3f91-fa8b-4d78-fac6-4322c74b1b00/public" data-addsearch="no_crop">
+<meta name="revisit-after" content="1 days">
+<link href="/css/chat.css" rel="stylesheet" type="text/css">
+<script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+{%endblock %}
+{% block content %}
+
+
+<section class="chat-section container-fluid" >
+    <div class="header-area header-bar">
+      <div class="container h-100">
+        <!-- Header Content -->
+        <div class="header-content position-relative d-flex align-items-center justify-content-between h-100">
+          <!-- Chat User Info -->
+          <div class="chat-user--info d-flex align-items-center">
+            <!-- Back Button -->
+            <div class="back-button"><a href="{{url_for('message.render_message_html')}}">
+                <svg class="bi bi-arrow-left-short" width="32" height="32" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5z"></path>
+                </svg></a></div>
+            <!-- User Thumbnail & Name -->
+            <div class="d-flex ms-4">
+                <img src="{{user_object.retrieve_profile_picture()}}" class="avatar avatar-md-sm rounded-circle border shadow" alt="">
+                <div class="overflow-hidden ms-3">
+                    <a href="/u/{{user_object.display_username()}}" class="text-dark mb-0 h6 d-block text-truncate">{{user_object.display_username()}}</a>
+                    {% if user_object.is_user_online() %}
+                    <small class="text-muted"><i class="mdi mdi-checkbox-blank-circle text-success on-off align-text-bottom"></i> Online</small>
+                    {% else %}
+                    <small class="text-muted"><i class="mdi mdi-checkbox-blank-circle text-danger on-off align-text-bottom"></i> Offline</small>
+                    {% endif %}
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="chat_messages" class="page-content-wrapper py-3 bg-soft-secondary chat-scroll" style="min-height: calc(100vh - 194px);overflow: auto">
+      <div class="container">
+        <div class="chat-content-wrap add-messages">
+            <!-- Add messages from server -->
+        </div>
+      </div>
+    </div>
+</section>
+<div class="chat-footer container-fluid">
+      <div class="container h-100">
+        <div class="chat-footer-content h-100 d-flex align-items-center">
+<!--          <form action="#">-->
+            <!-- Message -->
+            <input class="form-control" name="message_content" id="message_content" type="text" placeholder="Type here...">
+            <!-- Send -->
+            <button class="btn btn-submit" onclick="send_message()" type="submit">
+              <svg class="bi bi-cursor" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 0 0 1 .556.103zM2.25 8.184l3.897 1.67a.5.5 0 0 1 .262.263l1.67 3.897L12.743 3.52 2.25 8.184z"></path>
+              </svg>
+            </button>
+<!--          </form>-->
+        </div>
+      </div>
+</div>
+
+<div id="current_user_data" data-username="{{current_user.username}}" data-avatar="{{current_user.retrieve_profile_picture()}}" data-channel="{{current_user.id}}"></div>
+{% if username != None %}
+<div id="receiver_data" data-receiver="{{username}}" data-room="{{chat_room.id}}"></div>
+{% endif %}
+
+{% endblock %}
+{% block footer %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/he/1.2.0/he.min.js" integrity="sha512-PEsccDx9jqX6Dh4wZDCnWMaIO3gAaU0j46W//sSqQhUQxky6/eHZyeB3NrXD2xsyugAKd4KPiDANkcuoEa2JuA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="/js/chat-2.js"></script>
+{% endblock %}

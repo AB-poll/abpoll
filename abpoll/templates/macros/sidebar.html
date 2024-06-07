@@ -1,0 +1,25 @@
+{# Render the sidebar. #}
+{% macro users(class_to_add="", how_it_works="", active=False) %}
+<!-- TODO: remove the css bellow subscribe pop up model -->
+<link href="/css/clean.css" rel="stylesheet" type="text/css"/>
+
+<div class="col-xl-4 col-lg-5 order-3 col-md-5 {{class_to_add}}">
+    <div class="sidebar sticky-bar" id="right-sidebar">
+        {% if how_it_works !="" and not active %}
+        <div class="card border-0 rounded mb-4 p-4 bg-light">
+            <div class="d-flex align-items-center justify-content-between">
+                <h5 class="mb-0 text-info"><i class="uil uil-question-circle"></i> How It Works </h5>
+            </div>
+            <p class="text-dark pt-2 mb-0">{{how_it_works}}</p>
+        </div>
+        {% endif%}
+
+        <div class="card border-0 rounded p-4 bg-light sticky-bar" id="recommended-user">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <h5 class="mb-0 text-info"><span class="ps-1">View Topics</span></h5>
+            </div>
+        </div>
+
+    </div>
+</div>
+{%- endmacro %}

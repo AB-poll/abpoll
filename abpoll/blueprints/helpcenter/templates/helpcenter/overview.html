@@ -1,0 +1,141 @@
+{% extends 'layouts/base-2.html' %}
+{% block title %}Overview / ABpoll{% endblock %}
+{% block description %}A look at all the resources available to better assist you in your auctions/bidding...{% endblock %}
+{% block content %}
+<div class="mt-4 d-block d-md-none">
+	<!-- Spacer -->
+</div>
+<!-- Start Section -->
+<section class="section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <div class="section-title text-center mb-4 pb-2">
+                    <h4 class="mb-4">Find the help you need</h4>
+                    <p class="para-desc mx-auto text-muted">ABpoll is an analytics app that gives you already answered surveys instead of creating surveys the traditional way. This can save you a lot of time and effort when trying to gather data and feedback from your customers or target audience.</p>
+                    <p class="para-desc mx-auto text-muted">If you need any help using Abpoll, or have any questions about the app, please submit a Support Request and we'll be happy to help you out.</p>
+                </div>
+            </div><!--end col-->
+        </div><!--end row-->
+
+        <div class="row justify-content-center">
+            <div class="col-lg-4 col-md-6 col-12 mt-4 pt-2">
+                <div class="card features feature-primary explore-feature border-0 rounded text-center">
+                    <div class="card-body">
+                        <div class="icons rounded-circle shadow-lg d-inline-block mb-2 h3">
+                            <i class="uil uil-question-circle"></i>
+                        </div>
+                        <div class="content mt-3">
+                            <a href="{{url_for('helpcenter.faq')}}" class="title h5 text-dark">FAQs</a>
+                            <p class="text-muted mt-3 mb-0">Just in case your question was answered before consider looking over the frequently asked questions.</p>
+                        </div>
+                    </div>
+                </div>
+            </div><!--end col-->
+
+            <div class="col-lg-4 col-md-6 col-12 mt-4 pt-2">
+                <div class="card features feature-primary explore-feature border-0 rounded text-center">
+                    <div class="card-body">
+                        <div class="icons rounded-circle shadow-lg d-inline-block mb-2 h3">
+                            <i class="uil uil-file-bookmark-alt"></i>
+                        </div>
+                        <div class="content mt-3">
+                            <a href="{{url_for('general.terms')}}" class="title h5 text-dark">Terms of Use</a>
+                            <p class="text-muted mt-3 mb-0">You can brush up on the terms of use and more about how we take your privacy seriously.</p>
+                        </div>
+                    </div>
+                </div>
+            </div><!--end col-->
+
+            <div class="col-lg-4 col-md-6 col-12 mt-4 pt-2">
+                <div class="card features feature-primary explore-feature border-0 rounded text-center">
+                    <div class="card-body">
+                        <div class="icons rounded-circle shadow-lg d-inline-block mb-2 h3">
+                            <i class="uil uil-cog"></i>
+                        </div>
+                        <div class="content mt-3">
+                            <a href="{{url_for('helpcenter.support')}}" class="title h5 text-dark">Support Request</a>
+                            <p class="text-muted mt-3 mb-0">If you can't get your question answered by the FAQs bellow feel free to let us know here.</p>
+                        </div>
+                    </div>
+                </div>
+            </div><!--end col-->
+        </div><!--end row-->
+    </div><!--end container-->
+
+    <div class="container mt-100 mt-60">
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <div class="section-title text-center mb-4 pb-2">
+                    <h4 class="mb-4">Get Started</h4>
+                    <p class="para-desc mx-auto text-muted">You want to get started on creating ABpolls but don't know where to start follow these simple steps.</p>
+                </div>
+            </div><!--end col-->
+        </div><!--end row-->
+
+        <div class="row justify-content-center">
+            <div class="col-lg-9 mt-4 pt-2">
+                <div class="accordion" id="accordionExample">
+                    <div class="accordion-item rounded">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button border-0 bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
+                                    aria-expanded="true" aria-controls="collapseOne">
+                                How does it work ?
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse border-0 collapse show" aria-labelledby="headingOne"
+                             data-bs-parent="#accordionExample">
+                            <div class="accordion-body text-muted bg-white">
+                                You can sign up by clicking the top corner icon that says login or register, then fill out the information. This information will only be used for making this site better and won't be shared to any third parties. Plus your password is encrypted so no one can ever retrieve it, not even us.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item rounded mt-2">
+                        <h2 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button border-0 bg-light collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                Do I need a designer to use ABpoll ?
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse border-0 collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                            <div class="accordion-body text-muted bg-white">
+                                Nope, once you sign up you are ready to go, you can upload image backgrounds from your photos and ask that ABpoll you've always wanted to know. Just make sure the post doesn't violate our terms of use.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item rounded mt-2">
+                        <h2 class="accordion-header" id="headingThree">
+                            <button class="accordion-button border-0 bg-light collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                What do I need to do to start posting ?
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse border-0 collapse" aria-labelledby="headingThree"
+                             data-bs-parent="#accordionExample">
+                            <div class="accordion-body text-muted bg-white">
+                                You don't need anything but an account, and to register it's just a two step proccess click the register icon on top then submit the form.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item rounded mt-2">
+                        <h2 class="accordion-header" id="headingFour">
+                            <button class="accordion-button border-0 bg-light collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                How do I customize my notifications and email preferences ?
+                            </button>
+                        </h2>
+                        <div id="collapseFour" class="accordion-collapse border-0 collapse" aria-labelledby="headingFour"
+                             data-bs-parent="#accordionExample">
+                            <div class="accordion-body text-muted bg-white">
+                                To update your user settings just go to <a href="{{url_for('user.account_settings')}}">{{url_for('user.account_settings', _external=true)}}</a>, once done it will automatically be saved.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!--end col-->
+        </div><!--end row-->
+    </div><!--end container-->
+</section><!--end section-->
+<!-- End Section -->
+{% endblock %}

@@ -1,0 +1,619 @@
+{% import 'macros/sidebar.html' as sidebar %}
+{% import 'macros/post.html' as post_template %}
+{% extends 'layouts/base-2.html' %}
+{% block title %}{{post.title}} / ABpoll{% endblock %}
+{% block description %}{% if post.accessibility %} {{post.accessibility}} {% else %}{{post.a_text}} or {{post.b_text}} {% endif %}{% endblock %}
+{% block featured_image %}{{post.serve_cloudflare_image()}}{% endblock %}
+{% block header %}
+<meta name="keywords" content="online voting, polls, society, likes, this or that, ab testing." />
+<meta name="revisit-after" content="1 days">
+{% if current_user.is_active and current_user.role == 'admin'%}
+<!-- Tags -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tagify/4.9.5/jQuery.tagify.min.js" integrity="sha512-7eA13waXrgV/5I5zx8r77B2SQgBXJqqiU8bGczrRiyX6PGVCCf09FNWUJX4sB4gZe+Nrz1SKEqM6iC77JgK2pg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tagify/4.9.5/tagify.css" integrity="sha512-BaWShaAj9H6cyD1SI+/ekd0OtzwPiGXz6R1SP39S3n9URHluzg6asEPsbbldma1UVTGAf1NEYHFAnWcA5bxHzg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+{% endif %}
+{%endblock %}
+{% block content %}
+<!-- Start -->
+<div class="mt-4 d-block d-md-none">
+    <!-- Spacer -->
+</div>
+<section class="section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-5 col-lg-6 col-md-7 col-sm-12 order-md-2 order-lg-2 order-1">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <a href="/u/{{post.author.username}}" class="d-flex align-items-center">
+                        <img src="{{post.author.retrieve_profile_picture()}}" class="avatar avatar-md-sm rounded-circle border shadow" alt="">
+                        <div class="flex-1 ms-2">
+                            <h6 class="mb-0 text-dark">{{post.author.display_username()}}</h6>
+                        </div>
+                    </a>
+                    <div class="dropdown dropdown-primary">
+                        <button type="button" class="btn h5 p-0 text-muted" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="mdi ps-2 mdi-dots-vertical align-middle"></i>
+                        </button>
+                        <div class="dropdown-menu  dropdown-menu-end">
+                            {% if current_user.is_active and current_user.role == 'admin' %}
+                                <a href="javascript:void(0)" onclick="deletePost('{{post.id}}')" class="dropdown-item text-danger"><i class="mdi mdi-delete-outline align-middle"></i> Delete</a>
+                                <div class="dropdown-item cursor-pointer text-primary"
+                                     data-bs-toggle="modal"
+                                     data-bs-target="#AdminEditPost"
+                                     data-post_id="{{post.id}}"
+                                     data-title="{{post.title}}"
+                                     data-a_text="{{post.a_text}}"
+                                     data-b_text="{{post.b_text}}"
+                                     data-status="{{post.status}}"
+                                     data-image_1="{{post.image_1}}"
+                                     data-image_2="{% if post.image_2 != None %}{{post.image_2}}{% endif %}"
+                                     data-tags="{%if post.tags != None %}{% for tag in post.tags %}{{tag}}{% if not loop.last %}`{% endif %}{% endfor %}{% endif %}"
+                                     data-accessibility="{{post.accessibility}}"
+                                >
+                                    <i class="mdi mdi-pencil align-middle"></i> Edit
+                                </div>
+
+                            {% elif current_user.is_active and current_user.id == post.author.id %}
+                                <a href="javascript:void(0)" onclick="deletePost('{{post.id}}')" class="dropdown-item text-danger"><i class="mdi mdi-delete-outline align-middle"></i> Delete</a>
+                            {% else %}
+                                <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#reportForm"  class="dropdown-item text-danger" id="view-post-report-toggle"><i class="mdi mdi-flag-variant-outline align-middle"></i> Report</a>
+                            {% endif %}
+
+                            <a href="javascript:void(0)" onclick="copyLinkToClipboard('{{url_for("post.post_page", post_id=post.id, _external=True)}}')" class="dropdown-item text-dark"><i class="mdi mdi-content-copy align-middle"></i> Copy Link </a>
+                            <a href="javascript:void(0)" class="dropdown-item text-dark"><i class="mdi mdi-close align-middle"></i> close </a>
+                        </div>
+                    </div>
+                </div>
+
+                {% if post.events | length > 0 %}
+                <div class="row">
+                    <div class="w-100 h5 m-0 row">
+                        {% if post.events[0].status == 1%}
+                        <div class="col-6 m-0 h6 text-center d-flex justify-content-center align-items-center">
+                            <div class="predict-live-display col-6 m-0 h6 text-center d-flex justify-content-center align-items-center"> <span class="blob red"></span> <span class="ms-1 align-middle">Live</span> </div>
+                        </div>
+                        {% elif post.events[0].status == 2 %}
+                        <div class="col-6 m-0 h6 text-center d-flex justify-content-center align-items-center">
+                            {{moment(post.events[0].updated_on).fromNow(no_suffix = False)}}
+                        </div>
+                        {% else %}
+                        <div id="de_count_{{post.events[0].id}}" class="de_countdown rounded-start col-6 bg-light text-dark text-center" data-year="{{post.events[0].end_date.year}}" data-month="{{post.events[0].end_date.month}}" data-day="{{post.events[0].end_date.day}}" data-hour="{{post.events[0].end_date.hour}}" data-minute="{{post.events[0].end_date.minute}}"></div>
+                        {% endif %}
+                        {% set prediction = post.events[0].user_prediction() %}
+                        <a href="javascript:void(0)"
+                            data-id="{{post.events[0].id}}"
+                            data-bs-toggle="modal"
+                            data-bs-target="#prediction-modal"
+                            class="trigger-{{post.events[0].id}} predict-trigger col-6 btn rounded-0 btn-dark"
+                            data-title="{{post.title}}"
+                            data-year="{{post.events[0].end_date.year}}"
+                            data-month="{{post.events[0].end_date.month}}"
+                            data-day="{{post.events[0].end_date.day}}"
+                            data-hour="{{post.events[0].end_date.hour}}"
+                            data-minute="{{post.events[0].end_date.minute}}"
+                            data-a_text="{{post.a_text}}"
+                            data-b_text="{{post.b_text}}"
+                            data-a_amount="{{post.events[0].a_amount or 0}}"
+                            data-b_amount="{{post.events[0].b_amount or 0}}"
+                            data-status="{{post.events[0].status or 0}}"
+                            data-winning_index="{{post.events[0].winning_index or 0}}"
+                            data-spent_amount="{{prediction.amount}}"
+                            data-spent_index="{{prediction.index}}"
+                            >
+                            Predict
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+                <div id="grid" class="row">
+                {{post_template.card(post, hide_author=true)}}
+                </div>
+            </div>
+            {{ sidebar.users(class_to_add="", how_it_works="Vote and share your opinions in the comment section of why you chose that.", active=current_user.is_active) }}
+
+<!--            <div id="canvasSize-abpoll-js" class="col-lg-12 col-xl-10">-->
+<!--                <div style="max-height: 600px;" class="row">-->
+
+<!--                    <div class="p-0 col-md-6 col-12 h-100">-->
+<!--                        <div class="card border-0 d-block rounded">-->
+<!--                            <div class="card-body p-0">-->
+<!--                                <img id="displayImage-abpoll-js" src="{{post.serve_cloudflare_image()}}" class="img-fluid h-100 w-100" alt="{{post.accessibility}}">-->
+<!--                            </div>-->
+<!--                            {% if post.prev_post() != None %}-->
+<!--                            &lt;!&ndash; start previous post mechanism &ndash;&gt;-->
+<!--                            <div class="position-absolute top-50 start-0 translate-middle ms-4">-->
+<!--                                <a href="/p/{{post.prev_post().id}}" class="amp-poll-title"><i class="mdi h2 mdi-chevron-left align-middle"></i></a>-->
+<!--                            </div>-->
+<!--                            &lt;!&ndash; end previous post mechanism &ndash;&gt;-->
+<!--                            {% endif %}-->
+
+<!--                            {% if post.post_format == 'Trivia' %}-->
+<!--                                <div class="center-interactive {% if post.image_2 != None %}top-50{% else %}top-75{% endif %} i-amphtml-element i-amphtml-layout-container i-amphtml-story-interactive-component i-amphtml-built i-amphtml-layout ">-->
+<!--                                    &lt;!&ndash; removed i-amphtml-story-interactive-post-selection from bellow &ndash;&gt;-->
+<!--                                    <h1 class="amp-poll-title w-100 text-center m-0 fst-normal fs-4 lh-sm fw-bolder">{{post.title | safe }}</h1>-->
+<!--                                    {% if post.did_user_vote() %}-->
+<!--                                        <div id="{{post.id}}" class="i-amphtml-story-interactive-quiz-container i-amphtml-story-interactive-post-selection i-amphtml-story-interactive-container i-amphtml-story-interactive-has-data">-->
+<!--                                            <div class="i-amphtml-story-interactive-quiz-option-container">-->
+<!--                                                {% for option in post.options %}-->
+<!--                                                <button data-current="{{post.options_vote[loop.index0]}}" data-option="{{ letters[loop.index0] }}" style="&#45;&#45;option-percentage:{{post.percentage(post.options_vote[loop.index0])}}%;" {% if loop.index0 == post.selected_option %}correct="correct"{% endif %} class="i-amphtml-story-interactive-quiz-option i-amphtml-story-interactive-option {% if post.voted_index() == loop.index0 %}i-amphtml-story-interactive-option-selected{% endif %} "><span class="i-amphtml-story-interactive-quiz-answer-choice">{{ letters[loop.index0] | upper}}</span><span class="i-amphtml-story-interactive-quiz-option-text">{{option | safe }}</span><span class="i-amphtml-story-interactive-quiz-percentage-text">{{post.percentage(post.options_vote[loop.index0])}}%</span></button>-->
+<!--                                                {% endfor %}-->
+<!--                                            </div>-->
+<!--                                        </div>-->
+<!--                                    {% else %}-->
+<!--                                        <div id="{{post.id}}" class="i-amphtml-story-interactive-quiz-container i-amphtml-story-interactive-container i-amphtml-story-interactive-has-data">-->
+<!--                                            <div class="i-amphtml-story-interactive-quiz-option-container">-->
+<!--                                                {% for option in post.options %}-->
+<!--                                                <button data-current="{{post.options_vote[loop.index0]}}" data-option="{{ letters[loop.index0] }}" {% if loop.index0 == post.selected_option %}correct="correct"{% endif %} class="i-amphtml-story-interactive-quiz-option i-amphtml-story-interactive-option"><span class="i-amphtml-story-interactive-quiz-answer-choice">{{ letters[loop.index0] | upper}}</span><span class="i-amphtml-story-interactive-quiz-option-text">{{option | safe }}</span><span class="i-amphtml-story-interactive-quiz-percentage-text"></span></button>-->
+<!--                                                {% endfor %}-->
+<!--                                            </div>-->
+<!--                                        </div>-->
+<!--                                    {% endif %}-->
+<!--                                </div>-->
+<!--                            {% else %}-->
+<!--                                &lt;!&ndash; start voting mechanism &ndash;&gt;-->
+<!--                                {% if post.did_user_vote() %}-->
+<!--                                    <div class="position-absolute {% if post.image_2 == None %}top-75{% else %}top-50{% endif %} start-50 translate-middle w-60">-->
+<!--                                        <h1 class="amp-poll-title w-100 text-center m-0 fst-normal fs-4 lh-sm fw-bolder">{{post.title}}</h1>-->
+<!--                                        <div id="{{post.id}}" class="i-amphtml-story-poll-quad blue-dark i-amphtml-story-poll-responded" data-total="{{post.options_vote[0] + post.options_vote[1]}}">-->
+<!--                                            <span style="&#45;&#45;percentage:{{post.percentage(post.options_vote[0])}}%;" class="i-amphtml-story-poll-option bg-light mt-2 btn btn-pills btn-vote border-0 {% if post.voted_index() == 0 %}i-amphtml-story-poll-option-selected {% endif %}" data-current="{{post.options_vote[0]}}" data-option="a">-->
+<!--                                                <span class="i-amphtml-story-poll-option-title text-truncate">{{post.a_text}}</span>-->
+<!--                                                <span class="i-amphtml-story-poll-option-percentage">{{post.percentage(post.options_vote[0])}}%</span>-->
+<!--                                            </span>-->
+<!--                                            <span style="&#45;&#45;percentage:{{post.percentage(post.options_vote[1])}}%;" class="i-amphtml-story-poll-option bg-light mt-2 btn btn-pills btn-vote border-0 {% if post.voted_index() == 1 %}i-amphtml-story-poll-option-selected {% endif %}" data-current="{{post.options_vote[1]}}" data-option="b">-->
+<!--                                                <span class="i-amphtml-story-poll-option-title text-truncate">{{post.b_text}}</span>-->
+<!--                                                <span class="i-amphtml-story-poll-option-percentage">{{post.percentage(post.options_vote[1])}}%</span>-->
+<!--                                            </span>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                {% else %}-->
+<!--                                    <div class="position-absolute {% if post.image_2 == None %}top-75{% else %}top-50{% endif %} start-50 translate-middle w-60">-->
+<!--                                        <h1 class="amp-poll-title w-100 text-center m-0 fst-normal fs-4 lh-sm fw-bolder">{{post.title}}</h1>-->
+<!--                                        <div id="{{post.id}}" class="{% if post.status == 'ended'%}i-amphtml-story-poll-responded{% endif %} i-amphtml-story-poll-quad blue-dark" data-total="{{post.options_vote[0] + post.options_vote[1]}}">-->
+<!--                                            <span style="&#45;&#45;percentage:{{post.percentage(post.options_vote[0])}}%" class="i-amphtml-story-poll-option bg-light mt-2 btn btn-pills btn-vote border-0" data-current="{{post.options_vote[0]}}" data-option="a">-->
+<!--                                                <span class="i-amphtml-story-poll-option-title text-truncate">{{post.a_text}}</span>-->
+<!--                                                <span class="i-amphtml-story-poll-option-percentage">{% if post.status == "ended"%}{{post.percentage(post.options_vote[0])}}%{% endif %}</span>-->
+<!--                                            </span>-->
+<!--                                            <span style="&#45;&#45;percentage:{{post.percentage(post.options_vote[1])}}%" class="i-amphtml-story-poll-option bg-light mt-2 btn btn-pills btn-vote border-0" data-current="{{post.options_vote[1]}}" data-option="b">-->
+<!--                                                <span class="i-amphtml-story-poll-option-title text-truncate">{{post.b_text}}</span>-->
+<!--                                                <span class="i-amphtml-story-poll-option-percentage">{% if post.status == "ended"%}{{post.percentage(post.options_vote[1])}}%{% endif %}</span>-->
+<!--                                            </span>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                {% endif %}-->
+<!--                                &lt;!&ndash; end voting mechanism &ndash;&gt;-->
+<!--                            {% endif %}-->
+<!--                            {% if post.next_post() != None %}-->
+<!--                            &lt;!&ndash; start next post &ndash;&gt;-->
+<!--                            <div class="position-absolute top-50 end-0 translate-middle">-->
+<!--                                <a href="/p/{{post.next_post().id}}" class="amp-poll-title"><i class="mdi h2 mdi-chevron-right align-middle"></i></a>-->
+<!--                            </div>-->
+<!--                            &lt;!&ndash; end next post &ndash;&gt;-->
+<!--                            {% endif %}-->
+<!--                        </div>-->
+<!--                    </div>&lt;!&ndash;end col&ndash;&gt;-->
+
+<!--                    <div class="p-0 col-md-6 col-12" id="commentField">-->
+<!--                        <div class="d-md-none d-flex justify-content-between bg-light border-top-0" style="border-bottom-width: 0px !important;">-->
+<!--                            <div class="d-flex align-items-center w-100">-->
+<!--                                <p class="text-dark text-center w-100 m-0"><i class="mdi h4 mdi-drag-horizontal-variant align-middle"></i></p>-->
+<!--                            </div>-->
+<!--                        </div>-->
+
+<!--                        <div class="d-flex justify-content-between bg-light border-top-0" style="border-top-width: 0px !important;height: 65px;">-->
+<!--                            <div class="d-flex align-items-center ps-4 p-2">-->
+<!--                                <a class="pe-3" href="/u/{{post.author.username}}">-->
+<!--                                    <img src="{{post.author.retrieve_profile_picture()}}" class="img-fluid avatar avatar-md-sm rounded-circle shadow" alt="img">-->
+<!--                                </a>-->
+<!--                                <div class="flex-1 commentor-detail">-->
+<!--                                    <h6 class="mb-0">-->
+<!--                                        <a href="/u/{{post.author.username}}" class="media-heading text-dark">{{post.author.display_username()}} <span class="small">-</span> <span class="text-primary">Follow</span></a>-->
+<!--                                    </h6>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="mb-0 p-3 pe-2 dropdown-primary">-->
+<!--                                <button type="button" class="btn h5 p-0 text-muted" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
+<!--                                    <i class="mdi ps-2 mdi-dots-vertical align-middle"></i>-->
+<!--                                </button>-->
+<!--                                <div class="dropdown-menu  dropdown-menu-end">-->
+<!--                                    {% if current_user.is_active and current_user.role == 'admin' %}-->
+<!--                                        <a href="javascript:void(0)" onclick="deletePost('{{post.id}}')" class="dropdown-item text-danger"><i class="mdi mdi-delete-outline align-middle"></i> Delete</a>-->
+<!--                                        <div class="dropdown-item cursor-pointer text-primary"-->
+<!--                                             data-bs-toggle="modal"-->
+<!--                                             data-bs-target="#AdminEditPost"-->
+<!--                                             data-post_id="{{post.id}}"-->
+<!--                                             data-title="{{post.title}}"-->
+<!--                                             data-a_text="{{post.a_text}}"-->
+<!--                                             data-b_text="{{post.b_text}}"-->
+<!--                                             data-status="{{post.status}}"-->
+<!--                                             data-image_1="{{post.image_1}}"-->
+<!--                                             data-image_2="{% if post.image_2 != None %}{{post.image_2}}{% endif %}"-->
+<!--                                             data-tags="{%if post.tags != None %}{% for tag in post.tags %}{{tag}}{% if not loop.last %}`{% endif %}{% endfor %}{% endif %}"-->
+<!--                                             data-accessibility="{{post.accessibility}}"-->
+<!--                                        >-->
+<!--                                            <i class="mdi mdi-pencil align-middle"></i> Edit-->
+<!--                                        </div>-->
+
+<!--                                    {% elif current_user.is_active and current_user.id == post.author.id %}-->
+<!--                                        <a href="javascript:void(0)" onclick="deletePost('{{post.id}}')" class="dropdown-item text-danger"><i class="mdi mdi-delete-outline align-middle"></i> Delete</a>-->
+<!--                                    {% else %}-->
+<!--                                        <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#reportForm"  class="dropdown-item text-danger" id="view-post-report-toggle"><i class="mdi mdi-flag-variant-outline align-middle"></i> Report</a>-->
+<!--                                    {% endif %}-->
+
+<!--                                    <a href="javascript:void(0)" onclick="copyLinkToClipboard('{{url_for("post.post_page", post_id=post.id, _external=True)}}')" class="dropdown-item text-dark"><i class="mdi mdi-content-copy align-middle"></i> Copy Link </a>-->
+<!--                                    <a href="javascript:void(0)" class="dropdown-item text-dark"><i class="mdi mdi-close align-middle"></i> close </a>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+
+<!--                        {% if current_user.is_active %}-->
+<!--                        <div style="height: 60vh;" class="overflow-auto">-->
+<!--                            <div id="commentSection">-->
+<!--                                {% for comment in post.post_comments %}-->
+<!--                                <div id="{{comment.id}}" class="ps-4 pe-2 py-2 parent-element">-->
+<!--                                    <div class="d-flex justify-content-between">-->
+<!--                                        <div class="d-flex align-items-top">-->
+<!--                                            <a class="pe-3" href="/u/{{comment.comment_author.username}}">-->
+<!--                                                <img src="{{comment.comment_author.retrieve_profile_picture()}}" class="img-fluid avatar avatar-md-sm rounded-circle shadow" alt="img">-->
+<!--                                            </a>-->
+<!--                                            <div class="flex-1 commentor-detail">-->
+<!--                                                <p class="mb-0"><a href="/u/{{comment.comment_author.username}}" class="h6 text-dark media-heading">{{comment.comment_author.display_username()}}</a> <span class="text-muted small">• {{moment(comment.created_on).fromNow(no_suffix = False) |safe }}</span></p>-->
+<!--                                                <small class="">{{comment.text}}</small>-->
+<!--                                                <div><a href="javascript:void(0)" onclick="likeComment(this, '{{comment.id}}')" class="text-dark mdi small {% if comment.likes|selectattr("author", "==", current_user)|first %}mdi-thumb-up{% else %}mdi-thumb-up-outline{%endif%}"></a><span class="px-3"><span id="like-count-{{comment.id}}" class="abnum text-muted small" data-abbreviate="{{comment.likes|length}}">{{comment.likes|length}}</span></span></div>-->
+<!--                                            </div>-->
+<!--                                        </div>-->
+<!--                                        <span class="dropdown-primary child-display">-->
+<!--                                            <a href="javascript:void(0)" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
+<!--                                                <i class="mdi mdi-dots-vertical text-secondary align-middle icons"></i>-->
+<!--                                            </a>-->
+<!--                                            <span class="dropdown-menu  dropdown-menu-end">-->
+<!--                                                {% if current_user == post.author %}-->
+<!--                                                <a href="javascript:void(0)" onclick="deleteComment('{{comment.id}}')" class="dropdown-item text-danger"><i class="mdi mdi-delete-outline align-middle"></i> Delete</a>-->
+<!--                                                {% else %}-->
+<!--                                                <a href="javascript:void(0)" onclick="reportComment('{{comment.id}}')" class="dropdown-item text-danger"><i class="mdi mdi-flag-variant-outline align-middle"></i> Report</a>-->
+<!--                                                {% endif %}-->
+<!--                                                <a href="javascript:void(0)" class="dropdown-item text-dark"><i class="mdi mdi-close align-middle"></i> close </a>-->
+<!--                                            </span>-->
+<!--                                        </span>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                                {% endfor %}-->
+<!--                            </div>-->
+<!--                        </div>-->
+
+<!--                        <div style="height: 10%;" class="m-2 position-sticky">-->
+<!--                            <div class="h-100 d-flex align-items-end">-->
+<!--                                <div class="searchform w-100 pb-2">-->
+<!--                                    <div class="input-group bg-light">-->
+<!--                                        <input type="text" maxlength="320" name="comment_text" id="comment_text" class="form-control rounded-0 border-0 border-bottom" placeholder="Leave your opinion...">-->
+<!--                                        <button type="button" class="input-group-text text-muted p-1 m-0  btn btn-dark " id="commentSubmit" onclick="postComment('{{post.id}}')"><i class="h4 uil uil-enter p-0 m-0"></i></button>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        {% else %}-->
+<!--                        <div class="card border-0 sidebar sticky-bar" style="height: 85%;">-->
+<!--                            <div class="card-body">-->
+<!--                                &lt;!&ndash; Categories &ndash;&gt;-->
+<!--                                <div class="widget">-->
+<!--                                    <h5 class="widget-title text-center">Log in to see comments</h5>-->
+<!--                                    <div class="col-12 text-center">-->
+<!--                                        <p class="mb-0 mt-2"><small class="text-dark me-2">Log in to see comments and votes.</small></p>-->
+<!--                                    </div>-->
+<!--                                    <div class="login-form mt-4">-->
+<!--                                        <div class="row">-->
+<!--                                            <div class="col-lg-12 mb-0">-->
+<!--                                                <div class="d-grid">-->
+<!--                                                    <a href="{{url_for('user.login')}}?next=%2fp%2f{{post.id}}" class="btn btn-primary btn-pills">Log in</a>-->
+<!--                                                </div>-->
+<!--                                            </div>-->
+<!--                                            <div class="col-12 text-center">-->
+<!--                                                <p class="mb-0 mt-4"><small class="text-dark me-2">Don't have an account ?</small></p>-->
+<!--                                            </div>-->
+<!--                                            <div class="col-lg-12 mb-0">-->
+<!--                                                <div class="d-grid mt-4">-->
+<!--                                                    <a href="{{url_for('user.register')}}?next=%2fp%2f{{post.id}}" class="btn btn-primary btn-pills">Sign up</a>-->
+<!--                                                </div>-->
+<!--                                            </div>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                                &lt;!&ndash; Categories &ndash;&gt;-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        {% endif %}-->
+<!--                    </div>&lt;!&ndash;end col&ndash;&gt;-->
+
+<!--                </div>&lt;!&ndash;end row&ndash;&gt;-->
+<!--            </div>-->
+        </div>
+    </div><!--end container-->
+</section><!--end section-->
+<!-- Report Modal Content Start -->
+<div class="modal fade" id="reportForm" tabindex="-1" aria-labelledby="reportForm-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded shadow border-0">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="reportForm-title">Report</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-footer border-0 p-0">
+                <div class="table-responsive bg-white" id="view-post-report-options">
+                    <table class="table mb-0 table-center">
+                        <thead>
+                            <tr>
+                                <th scope="col">Why are you reporting this post?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr onclick="reportPost('{{post.id}}', 1)">
+                                <td class="py-3 cursor-pointer">I'm not interested in this Poll</td>
+                            </tr>
+                            <tr onclick="reportPost('{{post.id}}', 2)">
+                                <td class="py-3 cursor-pointer">It’s suspicious or spam</td>
+                            </tr>
+                            <tr onclick="reportPost('{{post.id}}', 3)">
+                                <td class="py-3 cursor-pointer">It displays a sensitive photo or video</td>
+                            </tr>
+                            <tr onclick="reportPost('{{post.id}}', 4)">
+                                <td class="py-3 cursor-pointer">It's abusive or harmful</td>
+                            </tr>
+                            <tr onclick="reportPost('{{post.id}}', 5)">
+                                <td class="py-3 cursor-pointer">False information</td>
+                            </tr>
+                            <tr onclick="reportPost('{{post.id}}', 6)">
+                                <td class="py-3 cursor-pointer">It expresses intentions of self-harm or suicide</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-none row justify-content-center py-3" id="view-post-success">
+                    <div class="col-12">
+                        <div class="text-center">
+                            <div class="icon d-flex align-items-center justify-content-center bg-soft-primary rounded-circle mx-auto" style="height: 90px; width:90px;">
+                                <i class="uil uil-thumbs-up align-middle h1 mb-0"></i>
+                            </div>
+                            <h5 class="my-4 fw-bold">Thanks for letting us know</h5>
+                            <p class="text-muted para-desc mx-auto">Your feedback is important in helping us keep the ABpoll community safe.</p>
+                        </div>
+                    </div><!--end col-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End -->
+{% if post.events | length > 0 or post.events != None %}
+<!-- Prediction Pop Up Start -->
+<div class="modal fade" id="prediction-modal" tabindex="-1" aria-hidden="true" data-id="">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow border-0">
+            <div class="modal-title text-center h5 py-2 border-bottom">
+                <div class="d-flex justify-content-between px-3">
+                    <span>Prediction</span>
+                    <span class="text-primary">
+                        <span class="balance text-dark">{{current_user.coins or "Login to start"}}</span>
+                        <i class="uil uil-coins"></i>
+                    </span>
+                </div>
+            </div>
+            <div class="modal-body py-3">
+                <div class="text-center py-2 bg-light w-100">
+                    <div class="h6 mb-1 predict-title">
+                        Title
+                    </div>
+                    <div class="predict-submission-status">
+                        Submission closing in <div class="predict-countdown" data-year="2030" data-month="07" data-day="01" data-hour="11" data-minute="30"></div>
+                    </div>
+                </div>
+                <div class="row py-3">
+                    <!-- A side voting panel -->
+                    <div class="predict-voting-panel col-6 text-info text-end ">
+                        <div class="h6 predict-choice">A Option</div>
+                        <div class="d-flex justify-content-between">
+                            <div class="p align-self-center">
+                                <i class="uil uil-coins"></i>
+                                <span class="predict-total abnum text-dark" abbreviate="0">0</span>
+                            </div>
+                            <div class="predict-percentage h4 m-0">0%</div>
+                        </div>
+                        <div class="progress-box mt-3">
+                            <div class="progress d-flex justify-content-end">
+                                <div class="predict-progress-bar progress-bar position-relative bg-info" style="width:0%;">
+                                </div>
+                            </div>
+                        </div><!--end process box-->
+
+                    </div>
+                    <!-- B Side voting panel -->
+                    <div class="predict-voting-panel col-6 border-start text-warning text-start">
+                        <div class="h6 predict-choice">B Option</div>
+                        <div class="d-flex justify-content-between">
+                            <div class="predict-percentage h4 m-0">0%</div>
+                            <div class="p align-self-center">
+                                <span class="predict-total abnum text-dark" abbreviate="0">0</span>
+                                <i class="uil uil-coins"></i>
+                            </div>
+                        </div>
+                        <div class="progress-box mt-3">
+                            <div class="progress">
+                                <div class="predict-progress-bar progress-bar position-relative bg-warning" style="width:0%;">
+                                </div>
+                            </div>
+                        </div><!--end process box-->
+
+                    </div>
+                    <!-- Voting Buttons Start -->
+
+                    <div class="predict-vote-section col-6 pt-2">
+                        <div class="d-flex justify-content-end">
+                            <form action="javascript:;" onsubmit="return submit_prediction(this, 0);" class="input-group input-group-sm mt-4 needs-validation" novalidate style="width:150px;"  enctype="multipart/form-data" method="post">
+                                <input name="predict_amount" required="" min="1"  max="{{current_user.coins}}" type="number" class="predict-amount-input form-control" aria-label="A Vote Amount" aria-describedby="predict-button-1">
+                                <button class="btn btn-info" type="submit" id="predict-button-1">Vote</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="predict-vote-section col-6 pt-2">
+                        <div class="d-flex justify-content-start">
+                            <form action="javascript:;" onsubmit="return submit_prediction(this, 1);" class="input-group input-group-sm mt-4 needs-validation" novalidate style="width:150px;" enctype="multipart/form-data" method="post">
+                                <input name="predict_amount" required="" min="1"  max="{{current_user.coins}}" type="number" class="predict-amount-input form-control" aria-label="B Vote Amount" aria-describedby="predict-button-2">
+                                <button class="btn btn-warning" type="submit" id="predict-button-2">Vote</button>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- Voting Buttons End -->
+                </div>
+                <div class="text-center">
+                    <div class="my-2">
+                        <a href="javascript:void(0)" data-bs-dismiss="modal" aria-label="Cancel" class="">Cancel</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Prediction Modal -->
+<script src="/js/jquery.countdown.js"></script>
+<script src="/js/predictions.js"></script>
+{% endif %}
+
+{% if current_user.is_active and current_user.role == 'admin' %}
+
+<!-- Modal Content Start -->
+<div class="modal fade" id="AdminEditPost" tabindex="-1" aria-labelledby="AdminEditPost-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded shadow border-0">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="AdminEditPost-title">Edit Post</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{url_for('admin.edit_posts')}}" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                <div class="modal-body">
+                    <div class="row">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label">Post Id <span class="text-danger">*</span></label>
+                                <div class="form-icon position-relative">
+                                    <input required="" type="text" class="form-control" name="post_id">
+                                </div>
+                            </div>
+                        </div><!--end col-->
+
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label">Title</label>
+                                <div class="form-icon position-relative">
+                                    <input type="text" class="form-control" name="title">
+                                </div>
+                            </div>
+                        </div><!--end col-->
+
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label">A Text <span class="text-danger">*</span></label>
+                                <div class="form-icon position-relative">
+                                    <input type="text" class="form-control" name="a_text" required="">
+                                </div>
+                            </div>
+                        </div><!--end col-->
+
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label">B Text <span class="text-danger">*</span></label>
+                                <div class="form-icon position-relative">
+                                    <input type="text" class="form-control" name="b_text" required="">
+                                </div>
+                            </div>
+                        </div><!--end col-->
+
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label">Status <span class="text-danger">*</span></label>
+                                <div class="form-icon position-relative">
+                                    <input type="text" class="form-control" name="status" required="">
+                                </div>
+                            </div>
+                        </div><!--end col-->
+
+
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label">Image 1 Link<span class="text-danger">*</span></label>
+                                <div class="form-icon position-relative">
+                                    <input type="text" class="form-control" name="image_1_id" required="">
+                                </div>
+                            </div>
+                        </div><!--end col-->
+
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label">Image 1 File</label>
+                                <div class="form-icon position-relative">
+                                    <input type="file" class="form-control" name="image_1_file">
+                                </div>
+                            </div>
+                        </div><!--end col-->
+
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label">Image 2</label>
+                                <div class="form-icon position-relative">
+                                    <input type="text" class="form-control" name="image_2_id">
+                                </div>
+                            </div>
+                        </div><!--end col-->
+
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label">Image 2 File</label>
+                                <div class="form-icon position-relative">
+                                    <input type="file" class="form-control" name="image_2_file">
+                                </div>
+                            </div>
+                        </div><!--end col-->
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label text-dark">Tags </label>
+                                <div class="form-icon position-relative">
+                                    <input style="padding: 0.375rem 0.75rem;" type="text" placeholder="Add 1-5 tags" class="form-control h6" name="tags">
+                                </div>
+                            </div>
+                        </div><!--end col-->
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label text-dark">Accessibility </label>
+                                <div class="form-icon position-relative">
+                                    <textarea rows="4" class="form-control h6 resize-none" placeholder="Alt text to explain the post to the visually impaired" name="accessibility"></textarea>
+                                </div>
+                            </div>
+                        </div><!--end col-->
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="submit" class="btn-pills btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal Content End -->
+<script>
+$('#AdminEditPost').on('show.bs.modal', function (e) {
+    document.querySelector('input[name="post_id"]').value = $(e.relatedTarget).data('post_id');
+    document.querySelector('input[name="title"]').value = $(e.relatedTarget).data('title');
+    document.querySelector('input[name="a_text"]').value = $(e.relatedTarget).data('a_text');
+    document.querySelector('input[name="b_text"]').value = $(e.relatedTarget).data('b_text');
+    document.querySelector('input[name="status"]').value = $(e.relatedTarget).data('status');
+    document.querySelector('input[name="image_1_id"]').value = $(e.relatedTarget).data('image_1');
+    document.querySelector('input[name="image_2_id"]').value = $(e.relatedTarget).data('image_2');
+    document.querySelector('input[name="tags"]').value = $(e.relatedTarget).data('tags');
+    document.querySelector('textarea[name="accessibility"]').value = $(e.relatedTarget).data('accessibility');
+})
+</script>
+<script src="/js/tagify_tags.js"></script>
+{% endif %}
+
+{% endblock %}
+{% block footer %}
+<script src="/js/abpoll.js"></script>
+{% endblock %}

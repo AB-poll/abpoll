@@ -1,0 +1,66 @@
+{% extends 'layouts/base-2.html' %}
+{% block title %}Message / ABpoll{% endblock %}
+{% block description %}Change your mailing preferences here.{% endblock %}
+{% block header %}
+<meta name="keywords" content="message, friends, find-people, polls, trivia, community." />
+<meta property="og:image" content="https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/939d3f91-fa8b-4d78-fac6-4322c74b1b00/public" data-addsearch="no_crop">
+<meta name="revisit-after" content="1 days">
+<link href="/css/chat.css" rel="stylesheet" type="text/css">
+<script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+{%endblock %}
+{% block page_background %}bg-soft-secondary{% endblock %}
+{% block content %}
+
+<section class="section h-100 container-fluid">
+    <div class="page-content-wrapper py-3">
+        <!-- Add New Contact -->
+        <div class="container">
+            <!-- Element Heading -->
+            <div class="element-heading">
+                <h6 class="ps-1">Inbox</h6>
+            </div>
+            <!-- Chat User List -->
+            <ul class="ps-0 chat-user-list room-to-append">
+                <!-- Single Chat User -->
+                {% for chat_room in current_user.chat_rooms() %}
+                <li id="{{chat_room.id}}" class="p-3 {% if chat_room.unread_count > 0 and  chat_room.private_chats[-1].sender != current_user %} chat-unread {% endif %}">
+                    <a class="d-flex" href="/my-account/message/{{current_user.display_username(user_id=chat_room.the_other_user())}}">
+                        <!-- Thumbnail -->
+                        <div class="chat-user-thumbnail me-3 shadow">
+                            <img class="img-circle avatar avatar-md-sm rounded-circle" src="{{current_user.retrieve_profile_picture(user_id=chat_room.the_other_user())}}" alt="">
+                            <!-- <span class="active-status"></span>-->
+                        </div>
+                        <!-- Info -->
+                        <div class="chat-user-info">
+                            <h6 class="text-truncate mb-0">{{current_user.display_username(user_id=chat_room.the_other_user())}}</h6>
+                            <div class="last-chat">
+                                <p class="mb-0 text-truncate">{{chat_room.last_message() | safe }} {% if chat_room.unread_count > 0 and  chat_room.private_chats[-1].sender != current_user %}<span class="badge rounded-pill bg-primary ms-2">{{chat_room.unread_count}}</span>{% endif %}</p>
+                            </div>
+                        </div>
+                    </a>
+                    <!-- Options -->
+                    <div class="dropstart chat-options-btn">
+                        <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="mdi mdi-dots-vertical"></i></button>
+                        <ul class="dropdown-menu">
+                            <li><a href="#"><i class="mdi mdi-volume-off"></i>Mute</a></li>
+                            <li><a href="#"><i class="mdi mdi-cancel"></i>Ban</a></li>
+                        </ul>
+                    </div>
+                </li>
+                {% endfor %}
+
+            </ul>
+        </div>
+    </div>
+</section>
+
+<div id="current_user_data" data-username="{{current_user.username}}" data-avatar="{{current_user.retrieve_profile_picture()}}" data-channel="{{current_user.id}}"></div>
+{% if username != None %}
+<div id="receiver_data" data-receiver="{{username}}" data-room="{{chat_room.id}}"></div>
+{% endif %}
+
+{% endblock %}
+{% block footer %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/he/1.2.0/he.min.js" integrity="sha512-PEsccDx9jqX6Dh4wZDCnWMaIO3gAaU0j46W//sSqQhUQxky6/eHZyeB3NrXD2xsyugAKd4KPiDANkcuoEa2JuA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="/js/chat-2.js"></script>
+{% endblock %}

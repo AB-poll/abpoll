@@ -1,0 +1,52 @@
+{% extends 'layouts/base-2.html' %}
+{% import 'macros/sidebar.html' as sidebar %}
+{% block title %}Home / ABpoll{% endblock %}
+{% block description %}We aim to use the inherent appeal of participating in pools for gathering insights to design better connections and foster relationships.{% endblock %}
+{% block featured_image %}https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/939d3f91-fa8b-4d78-fac6-4322c74b1b00/public{% endblock %}
+{% block header %}
+<meta name="keywords" content="online voting, polls, society, likes, this or that, ab testing." />
+<meta name="revisit-after" content="1 days">
+{%endblock %}
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-5 col-lg-6 col-md-7 col-sm-12 order-md-2 order-lg-2 order-1">
+                <div class="mt-4 d-block d-sm-none">
+                    <!-- Spacer -->
+                </div>
+
+                <div class="card card-body mb-4 bg-light border-0 shadow">
+                    <div class="d-flex align-items-top">
+                        <span class="px-2">
+                            {% if current_user.is_active %}
+                            <img src="{{current_user.retrieve_profile_picture()}}" class="avatar avatar-md-sm rounded-circle" alt="img">
+                            {% else %}
+                            <img src="https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/ddb56a3f-ca16-453b-1adb-7b171d40a900/profile" class="avatar avatar-md-sm rounded-circle" alt="img">
+                            {% endif %}
+                        </span>
+                        <div class="search-bar w-100">
+                            <a href="{{url_for('new_post.upload')}}" class="form-control rounded-pill border-0 text-muted">Ask a question?</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- end question -->
+
+                <div id="grid" class="row"></div>
+                <!--end row-->
+
+                <div id="loadMore" class="text-center mt-4">
+                    <span class="h6 mb-0 cursor-pointer">Loading... <i class="mdi mdi-loading text-primary mdi-spin h4 mb-0 align-middle"></i></span>
+                </div>
+            </div>
+
+            {{ sidebar.users(class_to_add="d-md-block d-sm-none d-none", how_it_works="abpoll is the perfect place to share your opinions on polls and predictions. With abpoll, you can see what the community prefers, and also let others know what you think. So come on over and join in the fun!", active=current_user.is_active) }}
+        </div>
+    </div><!--end container-->
+</section><!--end section-->
+<!-- end col -->
+{% endblock %}
+{% block footer %}
+<script src="/js/infinite_scroll.js"></script>
+<script src="/js/abpoll.js"></script>
+{% endblock %}

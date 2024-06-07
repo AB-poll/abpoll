@@ -1,0 +1,193 @@
+{% extends 'layouts/base-2.html' %}
+{% block title %}Settings / ABpoll{% endblock %}
+{% block description %}Change your profile and account information here.{% endblock %}
+{% block header %}
+<meta name="keywords" content="settings, profile, username, password." />
+<meta property="og:image" content="https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/939d3f91-fa8b-4d78-fac6-4322c74b1b00/public" data-addsearch="no_crop">
+<meta name="revisit-after" content="1 days">
+{%endblock %}
+{% block content %}
+<div class="mt-4 d-block d-sm-none">
+	<!-- Spacer -->
+</div>
+<section class="section">
+	<div class="container">
+		<div class="row justify-content-between">
+			<div class="col-md-6 mb-4">
+				<div class="bg-white px-lg-4" aria-labelledby="account-details">
+					{% if current_user.email_verified == False %}
+					<div class="alert alert-warning" role="alert">
+						Please check your email for a confirmation link or click <a href="{{url_for('user.resend_confirmation')}}" class="alert-link">here</a> to resend it.
+					</div>
+					{% endif %}
+					{% with messages = get_flashed_messages(with_categories=true) %}
+					{% if messages %}
+					{% for category, message in messages %}
+					<div class="alert alert-{{category}} fade show mb-0">{{ message|safe }}</div>
+					{% endfor %}
+					<br>
+					{% endif %}
+					{% endwith %}
+					<div class="card-body mt-3 text-md-start text-center d-sm-flex">
+						<img id="profile_image" src="{{current_user.retrieve_profile_picture()}}" class="avatar float-md-left avatar-medium rounded-circle shadow me-md-4" alt="">
+						<div class="mt-md-4 mt-3 mt-sm-0">
+							<form action="{{url_for('user.upload_profile')}}" method="post" enctype="multipart/form-data">
+								<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+								<input required type="file" accept=".jpeg, .jpg, .jfif, .pjpeg, .pjp, .png, .gif" id="BtnBrowseHidden" name="file" style="display: none;" onchange="document.getElementById('profile_image').src = window.URL.createObjectURL(this.files[0])">
+								<label for="BtnBrowseHidden" id="LblBrowse" class="btn btn-outline-light mt-2 ms-2 btn-pills">
+								Change Picture
+								</label>
+								<input type="submit" class="btn btn-primary mt-2 ms-2 btn-pills" name="save" value="Save">
+							</form>
+						</div>
+					</div>
+					<form id="username_email_bio_form" action="{{url_for('user.account_details')}}" method="POST" class="needs-validation" novalidate>
+						<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+						<div class="row">
+							<div class="col-md-6">
+								<div class="mb-3">
+									<label class="form-label">Your Email</label>
+									<div class="form-icon position-relative">
+										<i data-feather="mail" class="fea icon-sm icons{% if current_user.email_verified %} disabled-icon{% endif %}"></i>
+										<input {% if current_user.email_verified %}disabled {% endif %}name="email" type="email" class="form-control ps-5" value="{{current_user.email}}" required/>
+										<div class="invalid-feedback">
+											<p>Please insert a valid email.</p>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!--end col-->
+							<div class="col-md-6">
+								<div class="mb-3">
+									<label class="form-label">Username</label>
+									<div class="form-icon position-relative">
+										<i data-feather="user-check" class="fea icon-sm icons"></i>
+										<input pattern="^(?=.{4,20}$)(?:[a-zA-Z\d]+(?:(?:\|-|_)[a-zA-Z\d])*)+$" id="txt_username" name="username" type="text" maxlength="30" class="form-control ps-5" value="{{current_user.username}}" required/>
+										<div id="uname_response"></div>
+									</div>
+								</div>
+							</div>
+							<!--end col-->
+							<div class="mb-3">
+								<label class="form-label">Bio</label>
+								<div class="form-icon position-relative">
+									<i data-feather="message-circle" class="fea icon-sm icons"></i>
+									<textarea name="bio" maxlength="160" rows="3" class="form-control ps-5" placeholder="Bio :">{% if current_user.description != None %}{{ current_user.description }}{% endif %}</textarea>
+								</div>
+							</div>
+							<div class="col-lg-12 mt-2 mb-0">
+								<input type="submit" class="btn btn-primary btn-pills" value="Save Changes" disabled/>
+							</div>
+							<!--end col-->
+						</div>
+						<!--end row-->
+					</form>
+					{% if current_user.password != "GOOGLE_LOGIN" and current_user.password != "FACEBOOK_LOGIN" %}
+					<h5 class="mt-4">Change password :</h5>
+					<form id="password_reset_form" action="{{url_for('user.reset_password')}}" method="post" class="needs-validation" novalidate>
+						<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+						<div class="row mt-3">
+							<div class="col-lg-12">
+								<div class="mb-3">
+									<label class="form-label">Old password</label>
+									<div class="form-icon position-relative">
+										<i data-feather="key" class="fea icon-sm icons"></i>
+										<input type="password" name="old_password" class="form-control ps-5" placeholder="Old password" required=""/>
+										<div class="invalid-feedback">
+											Please enter a valid password
+										</div>
+									</div>
+								</div>
+							</div>
+							<!--end col-->
+							<div class="col-lg-12">
+								<div class="mb-3">
+									<label class="form-label">New password</label>
+									<div class="form-icon position-relative">
+										<i data-feather="key" class="fea icon-sm icons"></i>
+										<input type="password" minlength="8" maxlength="128" name="password_1" class="form-control ps-5" placeholder="New password" required=""/>
+										<div class="invalid-feedback">
+											Minimum eight characters, at least one letter and one number!
+										</div>
+									</div>
+								</div>
+							</div>
+							<!--end col-->
+							<div class="col-lg-12">
+								<div class="mb-3">
+									<label class="form-label">Re-type New password</label>
+									<div class="form-icon position-relative">
+										<i data-feather="key" class="fea icon-sm icons"></i>
+										<input type="password" minlength="8" maxlength="128" name="password_2" class="form-control ps-5" placeholder="Re-type New password" required=""/>
+										<div class="invalid-feedback">
+											Minimum eight characters, at least one letter and one number!
+										</div>
+									</div>
+								</div>
+							</div>
+							<!--end col-->
+							<div class="col-lg-12 mt-2 mb-0">
+								<input type="submit" class="btn btn-primary btn-pills" value="Save Password" disabled/>
+							</div>
+							<!--end col-->
+						</div>
+						<!--end row-->
+					</form>
+					{% endif %}
+				</div>
+			</div>
+			<div class="col-md-5">
+				{% if current_user.subscription %}
+				<h4>
+					{{ current_user.subscription.plan | title }}
+					subscription
+				</h4>
+				<h6 class="text-muted">
+					{{ current_user.credit_card.brand }}
+					{{ current_user.credit_card.last4 }}
+					({{ current_user.credit_card.exp_date.strftime('%m/%Y') }})
+				</h6>
+				<div class="list-group">
+					<a class="list-group-item list-group-item-action"
+						href="{{ url_for('billing.update_payment_method') }}">
+					Update payment info
+					</a>
+					<a class="list-group-item list-group-item-action"
+						href="{{ url_for('billing.billing_details') }}">
+					Billing details
+					</a>
+					<!-- <a class="list-group-item list-group-item-action"
+						href="{{ url_for('billing.update') }}">
+					Change plan
+					</a> -->
+					<a class="list-group-item list-group-item-action"
+						href="{{ url_for('billing.cancel') }}">
+					<span class="text-muted">Cancel subscription</span>
+					</a>
+				</div>
+				{% else %}
+				<h2>Subscribe today</h2>
+				<h5 class="text-muted">Hey buddy, why aren't you subscribed?</h5>
+				<p>
+					Now that you've created an account, wouldn't it be unbelievably
+					amazing to unlock everything by becoming a subscriber today?
+				</p>
+				<a href="{{ url_for('billing.pricing') }}" class="btn btn-primary btn-pills">
+				Learn more
+				</a>
+				{% if current_user.invoices %}
+				<h2 class="mt-5 mb-4">Previous subscription info</h2>
+				<div class="list-group">
+					<a class="list-group-item list-group-item-action"
+						href="{{ url_for('billing.billing_details') }}">
+					Billing details
+					</a>
+				</div>
+				{% endif %}
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</section>
+<!--end tab pane-->
+{% endblock %}

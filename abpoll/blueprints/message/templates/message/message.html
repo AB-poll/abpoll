@@ -1,0 +1,145 @@
+{% extends 'layouts/base-2.html' %}
+{% block title %}Message / ABpoll{% endblock %}
+{% block description %}Change your mailing preferences here.{% endblock %}
+{% block header %}
+<meta name="keywords" content="message, friends, find-people, polls, trivia, community." />
+<meta property="og:image" content="https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/939d3f91-fa8b-4d78-fac6-4322c74b1b00/public" data-addsearch="no_crop">
+<meta name="revisit-after" content="1 days">
+<link href="/css/chat.css" rel="stylesheet" type="text/css">
+{% if username != None %}
+<script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+{% endif %}
+{%endblock %}
+{% block content %}
+<section class="container-fluid">
+    <div class="layout-specing ">
+        <div class="row g-2">
+
+            <div class="col-xl-3 col-lg-5 col-md-5 col-12 mt-4">
+                <div class="border-0 rounded shadow">
+
+                    <div class="p-2 chat chat-list" data-simplebar="init" style="max-height: 507px;"><div class="simplebar-wrapper" style="margin: -8px;"><div class="simplebar-height-auto-observer-wrapper"><div class="simplebar-height-auto-observer"></div></div><div class="simplebar-mask"><div class="simplebar-offset" style="right: 0px; bottom: 0px;"><div class="simplebar-content-wrapper" style="height: auto; overflow: hidden scroll;">
+                        <div class="simplebar-content" style="padding: 8px;">
+                        {% for chat_room in current_user.chat_rooms() %}
+                                <!-- removed active bellow -->
+                                <a href="/my-account/message/{{current_user.display_username(user_id=chat_room.the_other_user())}}" class="d-flex chat-list p-2 rounded position-relative {% if chat_room.unread_count > 0 and  chat_room.private_chats[-1].sender != current_user %} active {% endif %}">
+                                    <div class="position-relative">
+                                        <img src="{{current_user.retrieve_profile_picture(user_id=chat_room.the_other_user())}}" class="avatar avatar-md-sm rounded-circle border shadow" alt="">
+                                        <!-- Check if current user is online -->
+                                        <!-- <i class="mdi mdi-checkbox-blank-circle text-success on-off align-text-bottom"></i> -->
+                                    </div>
+                                    <div class="overflow-hidden flex-1 ms-2">
+                                        <div class="d-flex justify-content-between">
+                                            <h6 class="text-dark mb-0 d-block">{{current_user.display_username(user_id=chat_room.the_other_user())}}</h6>
+                                            <small class="text-muted">{{moment(chat_room.updated_on).fromNow(no_suffix = False)}}</small>
+                                        </div>
+                                        {% if chat_room.unread_count > 0 and  chat_room.private_chats[-1].sender != current_user %}
+                                        <div class="d-flex justify-content-between">
+                                            <div class="text-dark h6 mb-0 text-truncate">{{chat_room.last_message() | safe }}</div>
+                                            <span class="badge rounded-md bg-soft-danger">{{chat_room.unread_count}}</span>
+                                        </div>
+                                        {% else %}
+                                        <div class="text-muted text-truncate">{{chat_room.last_message() | safe }}</div>
+                                        {% endif %}
+                                    </div>
+                                </a>
+
+                        {% endfor %}
+
+
+                    </div></div></div></div><div class="simplebar-placeholder" style="width: auto; height: 800px;"></div></div><div class="simplebar-track simplebar-horizontal" style="visibility: hidden;"><div class="simplebar-scrollbar" style="width: 0px; display: none;"></div></div><div class="simplebar-track simplebar-vertical" style="visibility: visible;"><div class="simplebar-scrollbar" style="height: 321px; transform: translate3d(0px, 186px, 0px); display: block;"></div></div></div>
+                </div>
+            </div>
+
+            <div class="col-xl-9 col-lg-7 col-md-7 col-12 mt-4">
+                <div class="chat chat-person border-0 shadow rounded">
+                    {% if username != None %}
+                    <div class="d-flex justify-content-between align-items-center border-bottom p-4">
+                        <div class="d-flex">
+                            <img src="{{user_object.retrieve_profile_picture()}}" class="avatar avatar-md-sm rounded-circle border shadow" alt="">
+                            <div class="overflow-hidden ms-3">
+                                <a href="/u/display_username()" class="text-dark mb-0 h6 d-block text-truncate">{{user_object.display_username()}}</a>
+                                {% if user_object.is_user_offline() %}
+                                <small class="text-muted"><i class="mdi mdi-checkbox-blank-circle text-danger on-off align-text-bottom"></i> Offline</small>
+                                {% else %}
+                                <small class="text-muted"><i class="mdi mdi-checkbox-blank-circle text-success on-off align-text-bottom"></i> Online</small>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <ul class="list-unstyled mb-0">
+                            <li class="dropdown dropdown-primary list-inline-item">
+                                <button type="button" class="btn btn-icon btn-soft-primary p-0 rounded-circle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="mdi mdi-dots-vertical"></i></button>
+                                <div class="dropdown-menu dd-menu dropdown-menu-end bg-white shadow border-0 mt-3 py-3" style="">
+                                    <a class="dropdown-item text-dark" href="#"><span class="mb-0 d-inline-block me-1"><i class="uil uil-cog"></i></span> Mute</a>
+                                    <a class="dropdown-item text-dark" href="#"><span class="mb-0 d-inline-block me-1"><i class="uil uil-cog"></i></span> Favorite</a>
+                                    <a class="dropdown-item text-dark" href="#"><span class="mb-0 d-inline-block me-1"><i class="uil uil-cog"></i></span> Block</a>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <ul class="p-4 list-unstyled mb-0 chat" data-simplebar="init" style="background: url('https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/82fddabb-d761-4eed-5c78-48150b03ee00/public') center center; max-height: 558px;">
+                        <div class="simplebar-wrapper" style="margin: -24px;">
+                            <div class="simplebar-height-auto-observer-wrapper">
+                                <div class="simplebar-height-auto-observer">
+
+                                </div>
+                            </div>
+                            <div class="simplebar-mask">
+                                <div class="simplebar-offset" style="right: 0px; bottom: 0px;">
+                                    <div id="chat_messages" class="simplebar-content-wrapper chat-scroll" style="height: auto; overflow: hidden scroll;">
+                                        <div class="simplebar-content add-messages" style="padding: 24px;">
+                                            <!-- Add messages from server -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="simplebar-placeholder" style="width: auto; height: 894px;">
+
+                            </div>
+                        </div>
+                        <div class="simplebar-track simplebar-horizontal" style="visibility: hidden;">
+                            <div class="simplebar-scrollbar" style="width: 0px; display: none; transform: translate3d(0px, 0px, 0px);">
+
+                            </div>
+                        </div>
+                        <div class="simplebar-track simplebar-vertical" style="visibility: visible;">
+                            <div class="simplebar-scrollbar" style="height: 348px; transform: translate3d(0px, 0px, 0px); display: block;">
+
+                            </div>
+                        </div>
+                    </ul>
+
+                    <div class="p-2 rounded-bottom shadow chat-box">
+            <!--            <form action="{{url_for('message.send_message', receiver_username=username)}}" method="post">-->
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <div class="row g-2">
+                                <div class="col">
+                                    <input type="text" name="message_content" id="message_content" class="form-control border" style="height: 36px;" placeholder="Enter Message...">
+                                </div>
+                                <div class="col-auto">
+                                    <button onclick="send_message()" type="submit" class="btn btn-icon btn-primary rounded-circle btn-send"><i class="mdi mdi-send"></i></button>
+                                </div>
+                            </div>
+            <!--            </form>-->
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <!-- content end -->
+        </div>
+    </div>
+</section>
+{% if username != None %}
+<div id="current_user_data" data-username="{{current_user.username}}" data-avatar="{{current_user.retrieve_profile_picture()}}" data-receiver="{{username}}" data-channel="{{current_user.id}}" data-room="{{chat_room.id}}">
+{% endif %}
+
+
+{% endblock %}
+{% block footer %}
+    {% if username != None %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/he/1.2.0/he.min.js" integrity="sha512-PEsccDx9jqX6Dh4wZDCnWMaIO3gAaU0j46W//sSqQhUQxky6/eHZyeB3NrXD2xsyugAKd4KPiDANkcuoEa2JuA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/js/chat-2.js"></script>
+    {% endif %}
+{% endblock %}

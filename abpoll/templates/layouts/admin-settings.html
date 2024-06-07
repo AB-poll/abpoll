@@ -1,0 +1,114 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Admin Dashboard / ABpoll{% endblock %}
+{% block description %}Here you will be able to offer refunds, ban users, correct user's information, and get user insights.{% endblock %}
+{% block header %}
+<!-- simplebar -->
+<link href="/css/simplebar.css" rel="stylesheet" type="text/css" />
+<!-- Icons -->
+<link href="/css/tabler-icons.min.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block page_bg %}bg-light{% endblock %}
+{% block content %}
+<div class="bg-half-40 bg-light"></div>
+<div class="row bg-light">
+    <!-- Side Nav START -->
+    <div class="col-lg-3 col-md-4 col-12 d-lg-block d-none ">
+        <div class="ps-4 sidebar sticky-bar ">
+          <ul class="rounded list-unstyled sidebar-nav mb-0" id="navmenu-nav">
+            <li class="navbar-item account-menu px-0 bg-white">
+              <a
+                class="navbar-link d-flex rounded shadow align-items-center py-2 px-4"
+                href="javascript:void(0)"
+              >
+                <div class="text-start py-1 px-3">
+                  <h6 class="mb-0 ms-2">
+                    <i class="uil uil-dashboard h5 align-middle me-2 mb-0"></i>
+                      Get ABpoll Plus
+                  </h6>
+                </div> </a><!--end nav link-->
+            </li>
+            <li class="navbar-item account-menu px-0 bg-white{% block not_dashboard %}{% endblock %}">
+              <a
+                class="navbar-link d-flex rounded shadow align-items-center py-2 px-4"
+                href="{{url_for('admin.dashboard')}}"
+              >
+                <div class="text-start py-1 px-3">
+                  <h6 class="mb-0 ms-2">
+                    <i class="uil uil-dashboard h5 align-middle me-2 mb-0"></i>
+                      Dashboard
+                  </h6>
+                </div> </a><!--end nav link-->
+            </li>
+            <!--end nav item-->
+
+            <li class="navbar-item account-menu px-0 bg-white{% block product_analytics %}{% endblock %}">
+              <a
+                class="navbar-link d-flex rounded shadow align-items-center py-2 px-4"
+                href="{{url_for('admin.posts')}}"
+              >
+                <div class="text-start py-1 px-3">
+                  <h6 class="mb-0 ms-2">
+                    <i class="uil uil-file-landscape-alt h5 align-middle me-2 mb-0"></i>
+                    Posts Analytics
+                  </h6>
+                </div> </a><!--end nav link-->
+            </li>
+            <!--end nav item-->
+
+
+            <li class="navbar-item account-menu px-0 bg-white{% block users_table %}{% endblock %}">
+              <a
+                class="navbar-link d-flex rounded shadow align-items-center py-2 px-4"
+                href="{{url_for('admin.users')}}"
+              >
+                <div class="text-start py-1 px-3">
+                  <h6 class="mb-0 ms-2">
+                    <i class="uil uil-list-ul h5 align-middle me-2 mb-0"></i>
+                    Users
+                  </h6>
+                </div>
+              </a>
+                <!--end nav link-->
+            </li>
+            <!--end nav item-->
+
+            <li class="navbar-item account-menu px-0 bg-white{% block invoices_table %}{% endblock %}">
+              <a
+                class="navbar-link d-flex rounded shadow align-items-center py-2 px-4"
+                id="account-details"
+                href=""
+              >
+                <div class="text-start py-1 px-3">
+                  <h6 class="mb-0 ms-2">
+                    <i class="uil uil-transaction h5 align-middle me-2 mb-0"></i>
+                      Invoices
+                  </h6>
+                </div>
+              </a><!--end nav link-->
+            </li>
+            <!--end nav item-->
+          </ul>
+          <!--end nav pills-->
+        </div>
+    </div>
+    <!-- Side Nav END -->
+
+    <!-- Page Container START -->
+    <div class="col-lg-9 col-12">
+        <div class="page-container">
+            {% block settings_field %}
+            {% endblock %}
+        </div>
+    </div>
+    {% block modal %}
+    {% endblock %}
+    <!-- Page Container END -->
+</div>
+{% endblock %}
+{% block footer_bg %}bg-light{% endblock %}
+{% block footer %}
+<!-- simplebar -->
+<script src="/js/simplebar.min.js"></script>
+<!-- Chart -->
+<script src="/js/apexcharts.min.js"></script>
+{% endblock %}

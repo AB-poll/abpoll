@@ -1,0 +1,86 @@
+{# Render a form field's label with visual aid to see if it's required. #}
+{%- macro field_label(f) -%}
+<label for="{{ f.id }}" class="form-label">
+    {{ f.label.text }}
+    {%- if f.flags.required -%}
+        <span class="text-danger"> *</span>
+    {%- endif %}
+</label>
+{%- endmacro -%}
+
+
+{# Render a form field's errors. #}
+{%- macro field_errors(f) -%}
+  {% if f.errors %}
+    <div class="invalid-feedback">
+      {% for error in f.errors %}
+        {{ error | e }}
+      {% endfor %}
+    </div>
+  {% endif %}
+{%- endmacro -%}
+
+
+{# Render a form field. #}
+{%- macro field(f, css_class='form-control') -%}
+  {{ f(class=css_class, **kwargs) }}
+{%- endmacro -%}
+
+{# Render a datetime form field. #}
+{%- macro datetime_field(f, class_class='form-control')-%}
+<input id="{{ f.id }}"
+       name="{{ f.id }}"
+       type="datetime-local"
+       max="2100-12-31"
+       class="form-control ps-2" >
+{%- endmacro -%}
+
+{# Render a checkbox field. #}
+{%- macro checkbox_field(f) -%}
+  {{ f(type='checkbox', **kwargs) }} {{ f.label }}
+{%- endmacro -%}
+
+
+{# Render a form group with errors for various field types. #}
+{%- macro form_group(f, css_class='') -%}
+  {% if f.errors %}
+    {% set css_class = css_class + ' has-error ' + kwargs.pop('class', '') %}
+  {% endif %}
+
+  {% if f.type == 'BooleanField' %}
+    <div class="checkbox {{ css_class }}">
+    {{ checkbox_field(f, **kwargs) }}
+  {% else %}
+    <div class="form-group {{ css_class }}">
+    {{ field_label(f) }}
+    {{ field(f, **kwargs) }}
+  {% endif %}
+
+    {{ field_errors(f) }}
+    {{ caller () }}
+  </div>
+{%- endmacro %}
+
+
+{# Render a form tag that contains a CSRF token and all hidden fields. #}
+{%- macro form_tag(endpoint, fid='', css_class='', method='post') -%}
+  <form action="{{ url_for(endpoint, **kwargs) }}" method="{{ method }}"
+        id="{{ fid }}" class="{{ css_class }} needs-validation" role="form" novalidate>
+    {% if method != "get"%}
+    {{ form.hidden_tag() }}
+    {% endif %}
+    {{ caller () }}
+  </form>
+{%- endmacro -%}
+
+
+{# Render a form for searching. #}
+{%- macro search(endpoint) -%}
+  {% call form_tag(endpoint, method='get') %}
+    <label for="q" class="form-label"></label>
+    <div class="input-group mb-3 border rounded">
+      <input type="text" id="q" name="q" class="form-control border-0" value="{{ request.args.get('q', '') }}" placeholder="Search by typing, then press enter...">
+      <button type="submit" class="input-group-text bg-white border-0" id="searchsubmit"><i class="uil uil-search"></i></button>
+   </div>
+  {% endcall %}
+{%- endmacro -%}

@@ -1,0 +1,98 @@
+{% extends 'layouts/anonymous-profile.html' %}
+{% block post_content %}
+<!-- Start Navigation -->
+
+<div class="row justify-content-center mt-4">
+    {% for post in posts %}
+        <div class="col-12 spacing picture-item">
+            <div class="card border-0 work-container position-relative d-block overflow-hidden rounded rounded-0">
+                <div class="card-body p-0">
+                    <a href="{{url_for('post.post_page', post_id=post.id)}}">
+                        <img src="{{post.serve_portrait_image()}}" class="img-fluid w-100" alt="work-image">
+                    </a>
+                    <!-- voting mechanism -->
+                    {% if post.post_format == 'Trivia' %}
+                        <div class="center-interactive {% if post.image_2 != None %}top-50{% else %}top-75{% endif %} i-amphtml-element i-amphtml-layout-container i-amphtml-story-interactive-component i-amphtml-built i-amphtml-layout ">
+                            <h1 class="amp-poll-title w-100 text-center m-0 fst-normal fs-4 lh-sm fw-bolder">{{post.title}}</h1>
+                            {% if post.did_user_vote(vote_id=vote_id) %}
+                                <!-- Removed id bellow -->
+                                <div class="i-amphtml-story-interactive-quiz-container i-amphtml-story-interactive-post-selection i-amphtml-story-interactive-container i-amphtml-story-interactive-has-data">
+                                    <div class="i-amphtml-story-interactive-quiz-option-container">
+                                        {% for option in post.options %}
+                                        <button data-current="{{post.options_vote[loop.index0]}}" data-option="{{ letters[loop.index0] }}" style="--option-percentage:{{post.percentage(post.options_vote[loop.index0])}}%;" {% if loop.index0 == post.selected_option %}correct="correct"{% endif %} class="i-amphtml-story-interactive-quiz-option i-amphtml-story-interactive-option {% if post.voted_index(vote_id=vote_id) == loop.index0 %}i-amphtml-story-interactive-option-selected{% endif %} "><span class="i-amphtml-story-interactive-quiz-answer-choice">{{ letters[loop.index0] | upper}}</span><span class="i-amphtml-story-interactive-quiz-option-text">{{option | safe }}</span><span class="i-amphtml-story-interactive-quiz-percentage-text">{{post.percentage(post.options_vote[loop.index0])}}%</span></button>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% else %}
+                                <!-- Removed id bellow -->
+                                <div class="i-amphtml-story-interactive-quiz-container i-amphtml-story-interactive-container i-amphtml-story-interactive-has-data">
+                                    <div class="i-amphtml-story-interactive-quiz-option-container">
+                                        {% for option in post.options %}
+                                        <button data-current="{{post.options_vote[loop.index0]}}" data-option="{{ letters[loop.index0] }}" {% if loop.index0 == post.selected_option %}correct="correct"{% endif %} class="i-amphtml-story-interactive-quiz-option i-amphtml-story-interactive-option"><span class="i-amphtml-story-interactive-quiz-answer-choice">{{ letters[loop.index0] | upper}}</span><span class="i-amphtml-story-interactive-quiz-option-text">{{option | safe }}</span><span class="i-amphtml-story-interactive-quiz-percentage-text"></span></button>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        {% if post.did_user_vote(vote_id=vote_id) %}
+                        <div class="position-absolute {% if post.image_2 == None %}top-75{% else %}top-50{% endif %} start-50 translate-middle w-60">
+                            <h1 class="amp-poll-title w-100 text-center m-0 fst-normal fs-4 lh-sm fw-bolder">{{post.title}}</h1>
+                            <!-- Removed id bellow -->
+                            <div class="i-amphtml-story-poll-quad blue-dark i-amphtml-story-poll-responded" data-total="1">
+                                <span style="--percentage:{{post.percentage(post.options_vote[0])}}%;" class="i-amphtml-story-poll-option bg-light mt-2 btn btn-pills btn-vote border-0 {% if post.voted_index(vote_id=vote_id) == 0 %}i-amphtml-story-poll-option-selected {% endif %}" data-current="{{post.options_vote[0]}}" data-option="a">
+                                    <span class="i-amphtml-story-poll-option-title text-truncate">{{post.a_text}}</span>
+                                    <span class="i-amphtml-story-poll-option-percentage">{{post.percentage(post.options_vote[0])}}%</span>
+                                </span>
+                                <span style="--percentage:{{post.percentage(post.options_vote[1])}}%;" class="i-amphtml-story-poll-option bg-light mt-2 btn btn-pills btn-vote border-0 {% if post.voted_index(vote_id=vote_id) == 1 %}i-amphtml-story-poll-option-selected {% endif %}" data-current="{{post.options_vote[1]}}" data-option="b">
+                                    <span class="i-amphtml-story-poll-option-title text-truncate">{{post.b_text}}</span>
+                                    <span class="i-amphtml-story-poll-option-percentage">{{post.percentage(post.options_vote[1])}}%</span>
+                                </span>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="position-absolute {% if post.image_2 == None %}top-75{% else %}top-50{% endif %} w-60 start-50 translate-middle">
+                            <h1 class="amp-poll-title w-100 text-center m-0 fst-normal fs-4 lh-sm fw-bolder">{{post.title}}</h1>
+                            <!-- Removed id bellow -->
+                            <div class="i-amphtml-story-poll-quad blue-dark" data-total="{{post.options_vote[0] + post.options_vote[1]}}">
+                                <span style="--percentage:50%" class="i-amphtml-story-poll-option bg-light mt-2 btn btn-pills btn-vote border-0" data-current="{{post.options_vote[0]}}" data-option="a">
+                                    <span class="i-amphtml-story-poll-option-title text-truncate">{{post.a_text}}</span>
+                                    <span class="i-amphtml-story-poll-option-percentage"></span>
+                                </span>
+                                <span style="--percentage:50%" class="i-amphtml-story-poll-option bg-light mt-2 btn btn-pills btn-vote border-0" data-current="{{post.options_vote[1]}}" data-option="b">
+                                    <span class="i-amphtml-story-poll-option-title text-truncate">{{post.b_text}}</span>
+                                    <span class="i-amphtml-story-poll-option-percentage"></span>
+                                </span>
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                    <!-- end Voting mechanism -->
+                </div>
+            </div>
+            <div class="post-meta d-flex justify-content-between text-muted p-2">
+                <ul class="list-unstyled mb-0">
+                    <li class="list-inline-item me-2 mb-0">
+                        <i class="uil uil-user"></i> <a href="/u/{{post.author.username}}"><span class="author text-muted">{{post.author.display_username()}}</span></a>
+                    </li>
+                    <li class="list-inline-item me-2 mb-0">
+                        <i class="uil uil-check-circle"></i> <span class="total-votes">{{post.options_vote[0] + post.options_vote[1]}}</span>
+                    </li>
+                    <li class="list-inline-item">
+                        <a href="javascript:postGetComments('{{post.id}}', 1)" class="text-muted comments">
+                            <i class="uil uil-comment"></i> <span id="{{post.id}}-number" class="total-comments">{{post.post_comments | length}}</span>
+                        </a>
+                    </li>
+                </ul>
+                <a onclick='triggerShare({{url_for('post.post_page', post_id=post.id, _external=True) | tojson}}, {{post.title | tojson }}, "")' class="text-muted cursor-pointer"><i class="uil uil-share-alt"></i></a>
+            </div>        
+        </div><!--end col-->
+    {% endfor %}
+</div>
+<!-- End Posts -->
+{% endblock %}
+{% block footer %}
+<script src="/js/abpoll.js"></script>
+<!-- shuffle js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Shuffle/5.4.1/shuffle.min.js" integrity="sha512-26vtWkj1Yt/eY2Ykb7TO/RzzysOKS7zaD/055jS+2IW4DX89qlH/HziTFqfzMLAxpFVpYhPWgTdCcavzf8Qs8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+{% endblock %}

@@ -1,0 +1,265 @@
+{% import 'macros/items.html' as items %}
+{% extends 'layouts/admin.html' %}
+{% block header %}
+<link href="/css/abpoll.css" rel="stylesheet" type="text/css">
+<!-- Tags -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tagify/4.9.5/jQuery.tagify.min.js" integrity="sha512-7eA13waXrgV/5I5zx8r77B2SQgBXJqqiU8bGczrRiyX6PGVCCf09FNWUJX4sB4gZe+Nrz1SKEqM6iC77JgK2pg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tagify/4.9.5/tagify.css" integrity="sha512-BaWShaAj9H6cyD1SI+/ekd0OtzwPiGXz6R1SP39S3n9URHluzg6asEPsbbldma1UVTGAf1NEYHFAnWcA5bxHzg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+{% endblock %}
+{% block content %}
+<!-- Start -->
+<div class="container-fluid">
+    <div class="layout-specing">
+        <div class="row justify-content-center">
+            <div class="col-xl-4 col-lg-5 col-md-7 col-sm-9 col-xs-12">
+                <div id="grid" class="row mt-2">
+                    {% for  post in posts %}
+                    <div id="{{post.id}}_object" class="col-12 spacing picture-item mb-3">
+                        <div class="border-0 work-container position-relative d-block overflow-hidden rounded-top">
+                            <div class="card-body p-0">
+                                <a href="{{url_for('post.post_page', post_id=post.id)}}">
+                                    <img src="{{post.serve_cloudflare_image()}}" class="img-fluid w-100" alt="work-image">
+                                </a>
+                                {% if post.post_format == 'Trivia' %}
+                                    <div class="center-interactive {% if post.image_2 != None %}top-50{% else %}top-75{% endif %} i-amphtml-element i-amphtml-layout-container i-amphtml-story-interactive-component i-amphtml-built i-amphtml-layout ">
+                                        <h1 class="amp-poll-title w-100 text-center m-0 fst-normal fs-4 lh-sm fw-bolder">{{post.title}}</h1>
+                                        {% if post.did_user_vote() %}
+                                            <div id="{{post.id}}" class="i-amphtml-story-interactive-quiz-container i-amphtml-story-interactive-post-selection i-amphtml-story-interactive-container i-amphtml-story-interactive-has-data">
+                                                <div class="i-amphtml-story-interactive-quiz-option-container">
+                                                    {% for option in post.options %}
+                                                    <button data-current="{{post.options_vote[loop.index0]}}" data-option="{{ letters[loop.index0] }}" style="--option-percentage:{{post.percentage(post.options_vote[loop.index0])}}%;" {% if loop.index0 == post.selected_option %}correct="correct"{% endif %} class="i-amphtml-story-interactive-quiz-option i-amphtml-story-interactive-option {% if post.voted_index() == loop.index0 %}i-amphtml-story-interactive-option-selected{% endif %} "><span class="i-amphtml-story-interactive-quiz-answer-choice">{{ letters[loop.index0] | upper}}</span><span class="i-amphtml-story-interactive-quiz-option-text">{{option | safe }}</span><span class="i-amphtml-story-interactive-quiz-percentage-text">{{post.percentage(post.options_vote[loop.index0])}}%</span></button>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <div id="{{post.id}}" class="i-amphtml-story-interactive-quiz-container i-amphtml-story-interactive-container i-amphtml-story-interactive-has-data">
+                                                <div class="i-amphtml-story-interactive-quiz-option-container">
+                                                    {% for option in post.options %}
+                                                    <button data-current="{{post.options_vote[loop.index0]}}" data-option="{{ letters[loop.index0] }}" {% if loop.index0 == post.selected_option %}correct="correct"{% endif %} class="i-amphtml-story-interactive-quiz-option i-amphtml-story-interactive-option"><span class="i-amphtml-story-interactive-quiz-answer-choice">{{ letters[loop.index0] | upper}}</span><span class="i-amphtml-story-interactive-quiz-option-text">{{option | safe }}</span><span class="i-amphtml-story-interactive-quiz-percentage-text"></span></button>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <!-- voting mechanism -->
+                                    <div class="position-absolute{% if post.image_2 == None %} top-75 w-60 start-50 translate-middle {% else %} top-50 w-60 start-50 translate-middle {% endif %}">
+                                        <h4 class="amp-poll-title w-100 text-center m-0 fst-normal fs-4 lh-sm fw-bolder">{{post.title}}</h4>
+                                        {% if post.did_user_vote() %}
+                                        <div id="{{post.id}}" class="i-amphtml-story-poll-quad blue-dark i-amphtml-story-poll-responded" data-total="{{post.options_vote[0] + post.options_vote[1]}}">
+                                            <span style="--percentage:{{post.percentage(post.options_vote[0])}}%;" class="i-amphtml-story-poll-option bg-light mt-2 btn btn-pills btn-vote border-0 {% if post.voted_index() == 0 %}i-amphtml-story-poll-option-selected {% endif %}" data-current="{{post.options_vote[0]}}" data-option="a">
+                                                <span class="i-amphtml-story-poll-option-title text-truncate">{{post.a_text}}</span>
+                                                <span class="i-amphtml-story-poll-option-percentage">{{post.percentage(post.options_vote[0])}}%</span>
+                                            </span>
+                                            <span style="--percentage:{{post.percentage(post.options_vote[1])}}%;" class="i-amphtml-story-poll-option bg-light mt-2 btn btn-pills btn-vote border-0 {% if post.voted_index() == 1 %}i-amphtml-story-poll-option-selected {% endif %}" data-current="{{post.options_vote[1]}}" data-option="b">
+                                                <span class="i-amphtml-story-poll-option-title text-truncate">{{post.b_text}}</span>
+                                                <span class="i-amphtml-story-poll-option-percentage">{{post.percentage(post.options_vote[1])}}%</span>
+                                            </span>
+                                        </div>
+
+                                        {% else %}
+                                        <div id="{{post.id}}" class="i-amphtml-story-poll-quad blue-dark" data-total="{{post.options_vote[0] + post.options_vote[1]}}">
+                                            <span style="--percentage:40%" class="i-amphtml-story-poll-option bg-light mt-2 btn btn-pills btn-vote border-0" data-current="{{post.options_vote[0]}}" data-option="a">
+                                                <span class="i-amphtml-story-poll-option-title text-truncate">{{post.a_text}}</span>
+                                                <span class="i-amphtml-story-poll-option-percentage"></span>
+                                            </span>
+                                            <span style="--percentage:60%" class="i-amphtml-story-poll-option bg-light mt-2 btn btn-pills btn-vote border-0" data-current="{{post.options_vote[1]}}" data-option="b">
+                                                <span class="i-amphtml-story-poll-option-title text-truncate">{{post.b_text}}</span>
+                                                <span class="i-amphtml-story-poll-option-percentage"></span>
+                                            </span>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <!-- end Voting mechanism -->
+                                {% endif %}
+
+                                <!-- creator tag -->
+                                <a href="/u/{{post.author.username}}" class="position-absolute top-0 start-0 rounded-left searchbtn btn btn-pills bg-light p-0 pe-2">
+                                    <div class="d-flex align-items-center">
+                                        <div class="pe-3">
+                                            <img src="{{post.author.retrieve_profile_picture()}}" class="img-fluid avatar avatar-md-sm rounded-circle shadow" alt="img">
+                                        </div>
+                                        <div class="flex-1 commentor-detail">
+                                            <h6 class="mb-0">
+                                                <span class="media-heading text-dark">{{post.author.display_username()}}</span>
+                                            </h6>
+                                        </div>
+                                    </div>
+                                </a>
+                                <!-- end creator tag -->
+                            </div>
+                        </div>
+                        <div class="w-100 d-flex text-dark bg-light m-0 rounded-bottom">
+                            <div onclick="approve_post('{{post.id}}')" class="col-6 text-center border-right py-2 cursor-pointer bg-success">
+                                <i class="uil uil-check"></i> Approve
+                            </div>
+                            <div class="col-6 text-center border-left py-2 cursor-pointer"
+                                 data-bs-toggle="modal"
+                                 data-bs-target="#AdminEditPost"
+                                 data-post_id="{{post.id}}"
+                                 data-title="{{post.title}}"
+                                 data-a_text="{{post.a_text}}"
+                                 data-b_text="{{post.b_text}}"
+                                 data-image_1="{{post.image_1}}"
+                                 data-image_2="{% if post.image_2 != None %}{{post.image_2}}{% endif %}"
+                                 data-tags="{%if post.tags != None %}{% for tag in post.tags %}{{tag}}{% if not loop.last %}`{% endif %}{% endfor %}{% endif %}"
+                                 data-accessibility="{{post.accessibility}}"
+                            >
+                                <i class="uil uil-pen"></i> Edit
+                            </div>
+                        </div>
+                    </div><!--end col-->
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div><!--end container-->
+<!-- End -->
+<!-- Modal Content Start -->
+<div class="modal fade" id="AdminEditPost" tabindex="-1" aria-labelledby="AdminEditPost-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded shadow border-0">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="AdminEditPost-title">Edit Post</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{url_for('admin.edit_posts')}}" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                <div class="modal-body">
+                    <div class="row">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label">Post Id <span class="text-danger">*</span></label>
+                                <div class="form-icon position-relative">
+                                    <input required="" type="text" class="form-control" name="post_id">
+                                </div>
+                            </div>
+                        </div><!--end col-->
+
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label">Title</label>
+                                <div class="form-icon position-relative">
+                                    <input type="text" class="form-control" name="title">
+                                </div>
+                            </div>
+                        </div><!--end col-->
+
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label">A Text <span class="text-danger">*</span></label>
+                                <div class="form-icon position-relative">
+                                    <input type="text" class="form-control" name="a_text" required="">
+                                </div>
+                            </div>
+                        </div><!--end col-->
+
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label">B Text <span class="text-danger">*</span></label>
+                                <div class="form-icon position-relative">
+                                    <input type="text" class="form-control" name="b_text" required="">
+                                </div>
+                            </div>
+                        </div><!--end col-->
+
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label">Image 1 Link<span class="text-danger">*</span></label>
+                                <div class="form-icon position-relative">
+                                    <input type="text" class="form-control" name="image_1_id" required="">
+                                </div>
+                            </div>
+                        </div><!--end col-->
+
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label">Image 1 File</label>
+                                <div class="form-icon position-relative">
+                                    <input type="file" class="form-control" name="image_1_file">
+                                </div>
+                            </div>
+                        </div><!--end col-->
+
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label">Image 2</label>
+                                <div class="form-icon position-relative">
+                                    <input type="text" class="form-control" name="image_2_id">
+                                </div>
+                            </div>
+                        </div><!--end col-->
+
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label">Image 2 File</label>
+                                <div class="form-icon position-relative">
+                                    <input type="file" class="form-control" name="image_2_file">
+                                </div>
+                            </div>
+                        </div><!--end col-->
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label text-dark">Tags </label>
+                                <div class="form-icon position-relative">
+                                    <input style="padding: 0.375rem 0.75rem;" type="text" placeholder="Add 1-5 tags" class="form-control h6" name="tags">
+                                </div>
+                            </div>
+                        </div><!--end col-->
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label text-dark">Accessibility </label>
+                                <div class="form-icon position-relative">
+                                    <textarea rows="4" class="form-control h6 resize-none" placeholder="Alt text to explain the post to the visually impaired" name="accessibility"></textarea>
+                                </div>
+                            </div>
+                        </div><!--end col-->
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="submit" class="btn btn-primary btn-pills">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal Content End -->
+<script>
+function approve_post(post_id) {
+
+    let csrfToken = $('meta[name=csrf-token]').attr('content');
+    $.ajax({
+        type: "POST",
+        url: "/admin/posts/approve",
+        data: {
+            'post_id': post_id,
+        },
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader('X-CSRFToken', csrfToken);
+        },
+        success: function(data) {
+            $('#' + post_id + '_object').remove();
+        },
+        error: function(data) {
+            console.log("error");
+        }
+    });
+
+};
+
+$('#AdminEditPost').on('show.bs.modal', function (e) {
+    document.querySelector('input[name="post_id"]').value = $(e.relatedTarget).data('post_id');
+    document.querySelector('input[name="title"]').value = $(e.relatedTarget).data('title');
+    document.querySelector('input[name="a_text"]').value = $(e.relatedTarget).data('a_text');
+    document.querySelector('input[name="b_text"]').value = $(e.relatedTarget).data('b_text');
+    document.querySelector('input[name="image_1_id"]').value = $(e.relatedTarget).data('image_1');
+    document.querySelector('input[name="image_2_id"]').value = $(e.relatedTarget).data('image_2');
+    document.querySelector('input[name="tags"]').value = $(e.relatedTarget).data('tags');
+    document.querySelector('textarea[name="accessibility"]').value = $(e.relatedTarget).data('accessibility');
+})
+
+</script>
+<script src="/js/tagify_tags.js"></script>
+{% endblock %}

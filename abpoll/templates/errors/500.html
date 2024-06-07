@@ -1,0 +1,122 @@
+{% extends 'layouts/clean.html' %}
+{% block title %}Page Unavailable Error / ABpoll{% endblock %}
+{% block description %}This page is currently still in production, check back later to see when it's complete.{% endblock %}
+{% block content %}
+<style>
+
+.coming-soon, .maintenance, .error-page {
+  font-size: 40px;
+  letter-spacing: 1px;
+}
+
+@media (max-width: 767px) {
+  .coming-soon, .maintenance, .error-page {
+    font-size: 32px;
+  }
+}
+
+#countdown .count-down, #eventdown .count-down {
+  display: inline-block;
+  margin: 30px 10px 10px;
+  color: #ffffff;
+  text-align: center;
+}
+
+#countdown .count-down .count-number, #eventdown .count-down .count-number {
+  font-size: 40px;
+  line-height: 95px;
+}
+
+#countdown .count-down .count-head, #eventdown .count-down .count-head {
+  display: block;
+  position: relative;
+  transform: translateY(-20px);
+  text-transform: uppercase;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+#countdown .count-down .count-number {
+  font-size: 40px;
+  line-height: 95px;
+  border: 4px solid #dee2e6;
+  height: 130px;
+  width: 130px;
+  border-radius: 50%;
+}
+
+#eventdown .count-down {
+  margin: 10px !important;
+  border: 0;
+}
+
+@media (max-width: 767px) {
+  #eventdown .count-down {
+    width: 60px;
+  }
+}
+
+#eventdown .count-down .count-number {
+  line-height: 80px;
+}
+
+@media (max-width: 767px) {
+  #eventdown .count-down .count-number {
+    font-size: 30px;
+  }
+}
+
+#eventdown .count-down .count-head {
+  transform: translateY(-15px);
+}
+
+@media (max-width: 767px) {
+  #eventdown .count-down .count-head {
+    font-size: 10px;
+  }
+}
+
+#maintenance {
+  color: #ffffff;
+  font-size: 56px;
+  letter-spacing: 1px;
+}
+
+#maintenance .indicator {
+  font-size: 18px;
+}
+</style>
+<!-- COMING SOON PAGE -->
+<section class="bg-home d-flex align-items-center" data-jarallax='{"speed": 0.5}' style="background-image: url('https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/2a73f945-909e-46c1-7400-e197ac760e00/public');">
+    <div class="bg-overlay"></div>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-12 text-center">
+                <a href="{{url_for('general.home')}}" class="logo h5"><img src="https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/c1e05fcb-72f7-46e4-e0f7-3507310e9700/logo" height="36" alt=""></a>
+                <div class="text-uppercase title-dark text-white mt-2 mb-4 coming-soon">{{coming_soon}}</div>
+                <p class="text-light para-desc para-dark mx-auto">{{description|safe}}</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <div id="countdown">
+                    <ul class="count-down list-unstyled border-0">
+                        <li id="days" class="count-number list-inline-item m-2"></li>
+                        <li id="hours" class="count-number list-inline-item m-2"></li>
+                        <li id="mins" class="count-number list-inline-item m-2"></li>
+                        <li id="secs" class="count-number list-inline-item m-2"></li>
+                        <li id="end" class="h1"></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <a href="{{url_for('general.home')}}" class="btn btn-primary btn-pills mt-4"><i class="mdi mdi-backup-restore"></i> Go Back Home</a>
+            </div>
+        </div>
+    </div> <!-- end container -->
+</section><!--section end-->
+<!-- COMING SOON PAGE -->
+{% endblock %}

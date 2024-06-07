@@ -1,0 +1,29 @@
+{% import 'macros/post.html' as post_template %}
+{% extends 'layouts/user-page.html' %}
+{% block post_content %}
+{% if current_user.is_active and User == current_user%}
+<!-- Start Navigation -->
+<div class="row justify-content-center text-center mt-3">
+    <div class="col-6 border-top pt-3">
+        <a href="javascript:void(0)" class="text-dark" title="Posts"><span class="mb-0 d-inline-block me-1"><i class="uil uil-images"></i></span> Posts</a>
+    </div>
+    <div class="col-6 pt-3">
+        <a href="{{url_for('post.user_page_votes', username=User.username)}}" class="text-muted" title="Votes"><span class="mb-0 d-inline-block me-1"><i class="uil uil-graph-bar"></i></span> Votes</a>
+    </div>
+</div><!--end row-->
+{% endif %}
+
+<div class="row justify-content-center mt-4">
+    {% for post in posts %}
+    {{post_template.card(post)}}
+    {% endfor %}
+</div>
+<!-- End Posts -->
+
+<script src="/js/abpoll.js"></script>
+<script>
+    window.onload = function() {
+        load_right_sidebar();
+    };
+</script>
+{% endblock %}

@@ -1,0 +1,238 @@
+{% extends 'layouts/admin.html' %}
+{% block title %}Live Events / ABpoll{% endblock %}
+{% block description %}Mange all live events in one page.{% endblock %}
+{% block header %}
+<link href="/css/abpoll.css" rel="stylesheet" type="text/css">
+<meta name="keywords" content="events, sports, polls, society." />
+<meta name="revisit-after" content="1 days">
+{%endblock %}
+{% block content %}
+<section class="section bg-white">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-8 col-sm-12 order-md-2 order-lg-2 order-1">
+                <div id="grid" class="row">
+                    <div class="mt-4 d-block d-sm-none">
+                        <!-- Spacer -->
+                    </div>
+                    {% for event in events %}
+                    <div class="col-12 spacing picture-item pt-0">
+                        <div class="w-100 h5 m-0 row">
+                            {% if event.status == 1%}
+                            <div class="col-6 m-0 h6 text-center d-flex justify-content-center align-items-center">
+                                <div class="predict-live-display col-6 m-0 h6 text-center d-flex justify-content-center align-items-center"> <span class="blob red"></span> <span class="ms-1 align-middle">Live</span> </div>
+                            </div>
+                            {% elif event.status == 2 %}
+                            <div class="col-6 m-0 h6 text-center d-flex justify-content-center align-items-center">
+                                {{moment(event.updated_on).fromNow(no_suffix = False)}}
+                            </div>
+                            {% else %}
+                            <div id="de_count_{{event.id}}" class="de_countdown rounded-start col-6 bg-light text-dark text-center" data-year="{{event.end_date.year}}" data-month="{{event.end_date.month}}" data-day="{{event.end_date.day}}" data-hour="{{event.end_date.hour}}" data-minute="{{event.end_date.minute}}"></div>
+                            {% endif %}
+                            {% set prediction = event.user_prediction() %}
+                            <a href="javascript:void(0)"
+                                data-id="{{event.id}}"
+                                data-bs-toggle="modal"
+                                data-bs-target="#prediction-modal"
+                                class="trigger-{{event.id}} predict-trigger rounded-top col-6 btn rounded-0 btn-soft-primary"
+                                data-title="{{event.post.title}}"
+                                data-year="{{event.end_date.year}}"
+                                data-month="{{event.end_date.month}}"
+                                data-day="{{event.end_date.day}}"
+                                data-hour="{{event.end_date.hour}}"
+                                data-minute="{{event.end_date.minute}}"
+                                data-a_text="{{event.post.a_text}}"
+                                data-b_text="{{event.post.b_text}}"
+                                data-a_amount="{{event.a_amount or 0}}"
+                                data-b_amount="{{event.b_amount or 0}}"
+                                data-status="{{event.status or 0}}"
+                                data-winning_index="{{event.winning_index or 0}}"
+                                data-spent_amount="{{prediction.amount}}"
+                                data-spent_index="{{prediction.index}}"
+                                >
+                                End Prediction
+                            </a>
+                        </div>
+                        <div class="card border-0 work-container position-relative d-block overflow-hidden rounded rounded-0">
+                            <div class="card-body p-0">
+                                <a href="{{url_for('post.post_page', post_id=event.post.id)}}">
+                                    <img src="{{event.post.serve_portrait_image()}}" class="img-fluid w-100" alt="work-image">
+                                </a>
+                                <!-- voting mechanism -->
+                                {% if event.post.did_user_vote() %}
+                                <div class="position-absolute {% if event.post.image_2 == None %}top-75{% else %}top-50{% endif %} start-50 translate-middle w-60">
+                                    <h1 class="amp-poll-title w-100 text-center m-0 fst-normal fs-4 lh-sm fw-bolder">{{event.post.title}}</h1>
+                                    <div id="{{event.post.id}}" class="i-amphtml-story-poll-quad blue-dark i-amphtml-story-poll-responded" data-total="{{event.post.options_vote[0] + event.post.options_vote[1]}}">
+                                        <span style="--percentage:{{event.post.percentage(event.post.options_vote[0])}}%;" class="i-amphtml-story-poll-option bg-light mt-2 btn btn-pills btn-vote border-0 btn btn-pills btn-vote {% if event.post.voted_index() == 0 %}i-amphtml-story-poll-option-selected {% endif %}" data-current="{{event.post.options_vote[0]}}" data-option="a">
+                                            <span class="i-amphtml-story-poll-option-title text-truncate">{{event.post.a_text}}</span>
+                                            <span class="i-amphtml-story-poll-option-percentage">{{event.post.percentage(event.post.options_vote[0])}}%</span>
+                                        </span>
+                                        <span style="--percentage:{{event.post.percentage(event.post.options_vote[1])}}%;" class="i-amphtml-story-poll-option bg-light mt-2 btn btn-pills btn-vote border-0 btn btn-pills btn-vote {% if event.post.voted_index() == 1 %}i-amphtml-story-poll-option-selected {% endif %}" data-current="{{event.post.options_vote[1]}}" data-option="b">
+                                            <span class="i-amphtml-story-poll-option-title text-truncate">{{event.post.b_text}}</span>
+                                            <span class="i-amphtml-story-poll-option-percentage">{{event.post.percentage(event.post.options_vote[1])}}%</span>
+                                        </span>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="position-absolute {% if event.post.image_2 == None %}top-75{% else %}top-50{% endif %} w-60 start-50 translate-middle">
+                                    <h1 class="amp-poll-title w-100 text-center m-0 fst-normal fs-4 lh-sm fw-bolder">{{event.post.title}}</h1>
+                                    <div id="{{event.post.id}}" class="i-amphtml-story-poll-quad blue-dark" data-total="{{event.post.options_vote[0] + event.post.options_vote[1]}}">
+                                        <span style="--percentage:50%" class="i-amphtml-story-poll-option bg-light mt-2 btn btn-pills btn-vote border-0 btn btn-pills btn-vote" data-current="{{event.post.options_vote[0]}}" data-option="a">
+                                            <span class="i-amphtml-story-poll-option-title text-truncate">{{event.post.a_text}}</span>
+                                            <span class="i-amphtml-story-poll-option-percentage"></span>
+                                        </span>
+                                        <span style="--percentage:50%" class="i-amphtml-story-poll-option bg-light mt-2 btn btn-pills btn-vote border-0 btn btn-pills btn-vote btn btn-pills btn-vote btn btn-pills btn-vote" data-current="{{event.post.options_vote[1]}}" data-option="b">
+                                            <span class="i-amphtml-story-poll-option-title text-truncate">{{event.post.b_text}}</span>
+                                            <span class="i-amphtml-story-poll-option-percentage"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                <!-- end Voting mechanism -->
+                            </div>
+                        </div>
+                        <div class="post-meta d-flex justify-content-between text-muted p-2">
+                            <ul class="list-unstyled mb-0">
+                                <li class="list-inline-item me-2 mb-0">
+                                    <i class="uil uil-user"></i> <a href="/u/{{event.post.author.username}}"><span class="author text-muted">{{event.post.author.display_username()}}</span></a>
+                                </li>
+                                <li class="list-inline-item me-2 mb-0">
+                                    <i class="uil uil-check-circle"></i> <span class="total-votes">{{event.post.options_vote[0] + event.post.options_vote[1]}}</span>
+                                </li>
+                                <li class="list-inline-item">
+                                    <a href="javascript:postGetComments('{{event.post.id}}', 1)" class="text-muted comments">
+                                        <i class="uil uil-comment"></i> <span id="{{event.post.id}}-number" class="total-comments">{{event.post.post_comments | length}}</span>
+                                    </a>
+                                </li>
+                            </ul>
+                            <a onclick='triggerShare({{url_for('post.post_page', post_id=event.post.id, _external=True) | tojson}}, {{event.post.title | tojson }}, "")' class="text-muted cursor-pointer"><i class="uil uil-share-alt"></i></a>
+                        </div>        
+            
+                    </div><!--end col-->
+                    {% endfor %}
+
+
+                </div><!--end row-->
+            </div>
+
+        </div>
+    </div><!--end container-->
+</section><!--end section-->
+<!-- end col -->
+
+<!-- Prediction Pop Up Start -->
+<div class="modal fade" id="prediction-modal" tabindex="-1" aria-hidden="true" data-id="">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded shadow border-0">
+            <div class="modal-title text-center h5 py-2 border-bottom">
+                <div class="d-flex justify-content-between px-3">
+                    <span>Prediction</span>
+                    {% if current_user.is_active %}
+                    <span class="text-primary">
+                        <span class="balance text-dark">{{current_user.coins}}</span>
+                        <i class="uil uil-coins"></i>
+                    </span>
+                    {% else %}
+                    <span class="text-primary">
+                        <span class="small text-dark">Login to start</span>
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="modal-body py-3">
+                <div class="text-center py-2 bg-light w-100">
+                    <div class="h6 mb-1 predict-title">
+                        Title
+                    </div>
+                    <div class="predict-submission-status">
+                        Submission closing in <div class="predict-countdown" data-year="2030" data-month="07" data-day="01" data-hour="11" data-minute="30"></div>
+                    </div>
+                </div>
+                <div class="row py-3">
+                    <!-- A side voting panel -->
+                    <div class="predict-voting-panel col-6 text-info text-end ">
+                        <div class="h6 predict-choice">A Option</div>
+                        <div class="d-flex justify-content-between">
+                            <div class="p align-self-center">
+                                <i class="uil uil-coins"></i>
+                                <span class="predict-total abnum text-dark" abbreviate="0">0</span>
+                            </div>
+                            <div class="predict-percentage h4 m-0">0%</div>
+                        </div>
+                        <div class="progress-box mt-3">
+                            <div class="progress d-flex justify-content-end">
+                                <div class="predict-progress-bar progress-bar position-relative bg-info" style="width:0%;">
+                                </div>
+                            </div>
+                        </div><!--end process box-->
+
+                    </div>
+                    <!-- B Side voting panel -->
+                    <div class="predict-voting-panel col-6 border-start text-warning text-start">
+                        <div class="h6 predict-choice">B Option</div>
+                        <div class="d-flex justify-content-between">
+                            <div class="predict-percentage h4 m-0">0%</div>
+                            <div class="p align-self-center">
+                                <span class="predict-total abnum text-dark" abbreviate="0">0</span>
+                                <i class="uil uil-coins"></i>
+                            </div>
+                        </div>
+                        <div class="progress-box mt-3">
+                            <div class="progress">
+                                <div class="predict-progress-bar progress-bar position-relative bg-warning" style="width:0%;">
+                                </div>
+                            </div>
+                        </div><!--end process box-->
+
+                    </div>
+                    <!-- Voting Buttons Start -->
+
+                    <div class="predict-vote-section col-6 pt-2">
+                        <div class="d-flex justify-content-end">
+                            <form action="javascript:;" onsubmit="return submit_prediction(this, 0);" class="input-group input-group-sm mt-4 needs-validation" novalidate style="width:150px;"  enctype="multipart/form-data" method="post">
+                                <input name="predict_amount" required="" min="1"  max="{{current_user.coins}}" type="number" class="predict-amount-input form-control" aria-label="A Vote Amount" aria-describedby="predict-button-1">
+                                <button class="btn btn-info" type="submit" id="predict-button-1">Vote</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="predict-vote-section col-6 pt-2">
+                        <div class="d-flex justify-content-start">
+                            <form action="javascript:;" onsubmit="return submit_prediction(this, 1);" class="input-group input-group-sm mt-4 needs-validation" novalidate style="width:150px;" enctype="multipart/form-data" method="post">
+                                <input name="predict_amount" required="" min="1"  max="{{current_user.coins}}" type="number" class="predict-amount-input form-control" aria-label="B Vote Amount" aria-describedby="predict-button-2">
+                                <button class="btn btn-warning" type="submit" id="predict-button-2">Vote</button>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- Voting Buttons End -->
+                    <div class="col-6 d-flex justify-content-end">
+                            <form action="javascript:;" onsubmit="return submit_winner(this, 0);" class="text-end mt-4" novalidate style="width:150px;"  enctype="multipart/form-data" method="post">
+                                <button class="btn btn-info btn-sm" type="submit">A Wins</button>
+                            </form>
+
+
+                    </div>
+                    <div class="col-6 d-flex-justify-content-start">
+                            <form action="javascript:;" onsubmit="return submit_winner(this, 1);" class="text-start mt-4" novalidate style="width:150px;"  enctype="multipart/form-data" method="post">
+                                <button class="btn btn-warning btn-sm" type="submit">B Wins</button>
+                            </form>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <div class="my-2">
+                        <a href="javascript:void(0)" data-bs-dismiss="modal" aria-label="Cancel" class="">Cancel</a>
+                        <!-- <button type="button" class="" data-bs-dismiss="modal" aria-label="Close">Cancel</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+</script>
+<!-- Prediction Modal -->
+{% endblock %}
+{% block footer %}
+<script src="/js/jquery.countdown.js"></script>
+<script src="/js/predictions.js"></script>
+<script src="/js/abpoll.js"></script>
+{% endblock %}

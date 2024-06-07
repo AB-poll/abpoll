@@ -1,0 +1,8 @@
+User-agent: *
+Crawl-delay: 10
+Disallow: /my-account/
+Disallow: /admin/
+Disallow: /groups/
+Disallow: /stripe_webhook/
+
+Sitemap: https://www.abpoll.com/sitemap.xml

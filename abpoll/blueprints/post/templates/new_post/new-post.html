@@ -1,0 +1,154 @@
+{% import 'macros/items.html' as items %}
+{% extends 'layouts/base-2.html' %}
+{% block title %}New Post / ABpoll{% endblock %}
+{% block description %}Create a post on abpoll.{% endblock %}
+{% block header %}
+<meta name="revisit-after" content="1 days">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tagify/4.9.8/jQuery.tagify.min.js" integrity="sha512-/iKW064UdZxSuXUCuiLfwIcuzjQBM/OmCSsGfe7wJI72oQP1dsVTSkKmzYMurpXNJyNMFDiDBkpgZAbk4alUUA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tagify/4.9.8/tagify.css" integrity="sha512-3TQTxe+kPDiA+h9hlIm4ydUdtreW8fVei75UUVmBioKA+prR2aYZqSDsCOBqGBmXJ4JSXKyj3bMHD1VAFDGyTA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="/css/create-post.css">
+{%endblock %}
+{% block content %}
+<!-- Start -->
+<section class="section">
+    <div class="container">
+        <div class="row justify-content-center">
+
+            <div class="col-lg-6 order-md-1 order-lg-2 order-1">
+                <form action="{{url_for('new_post.upload_post')}}" method="post" enctype="multipart/form-data" onkeydown="return event.key != 'Enter';">
+                    <div class="mt-4 d-block d-sm-none">
+                        <!-- Spacer -->
+                    </div>
+                    <!-- navigation pane -->
+                    <div class="ps-0 pe-4 d-flex justify-content-between border-bottom mb-3 align-middle">
+                        <button type="button" onclick="previous_section()" class="btn btn-link h5 m-0 pe-0"><i class="mdi h4 mdi-arrow-left"></i></button>
+                        <button class="btn btn-link pe-none text-dark h5 m-0 ">Create post</button>
+                        <button type="button" id="new_post_submit" onclick="next_section()" class="btn btn-link h5 m-0 pe-0 pe-0"><i class="uil uil-message"></i></button>
+                    </div>
+                    <div id="alert_placeholder">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{category}} h6 fade show mb-0">{{ message|safe }}</div>
+                        {% endfor %}
+                        {% endif %}
+                        {% endwith %}
+                    </div>
+                    <!-- section one -->
+                    <div id="section-1">
+                        <!-- Change Post Format -->
+                        <div class="w-100 d-flex bg-light p-0 m-0 d-none rounded-bottom">
+                            <button type="button" onclick="change_format(this, 'Poll')" class="new-post-format-option border-0 rounded-0 col-6 btn btn-dark">Poll</button>
+                            <button type="button" onclick="change_format(this, 'Trivia')" class="new-post-format-option border-0 rounded-0 col-6 btn btn-outline-dark ">Trivia</button>
+            <!--                <button type="button" onclick="change_format(this, 'Question')" class="new-post-format-option border-0 rounded-0 col-4 btn btn-outline-dark ">Question</button>-->
+                        </div>
+                        <!-- Post Start -->
+                        <div class="card border-0 d-block rounded-0">
+                            <div class="card-body p-0">
+                                <img id="display_image_1" src="" class="img-fluid w-100 d-none" alt="uploaded image 1">
+                            </div>
+                            <div>
+                                <img id="display_image_2" style="aspect-ratio: 4/2.5;" src="" class="img-fluid w-100 d-none" alt="uploaded image 2">
+                            </div>
+                            <!-- start voting mechanism -->
+                            <div class="center-interactive top-50">
+                                <!-- removed i-amphtml-story-interactive-post-selection from bellow -->
+                                <textarea class="title-component border-0 bg-transparent w-100 text-center m-0 fst-normal fs-4 lh-sm fw-bolder" name="title" contenteditable="" placeholder="Question?" rows="1" maxlength="100"></textarea>
+                                <div id="option-1" class="i-amphtml-story-interactive-quiz-container i-amphtml-story-interactive-container i-amphtml-story-interactive-has-data">
+                                    <div class="i-amphtml-story-interactive-quiz-option-container">
+                                        <button type="button" class="i-amphtml-story-interactive-quiz-option i-amphtml-story-interactive-option bg-light"><span class="i-amphtml-story-interactive-quiz-answer-choice text-primary">A</span><input class="i-amphtml-story-interactive-quiz-option-text w-100 border-0 bg-light" placeholder="Option A" contenteditable=""></button>
+                                        <button type="button" class="i-amphtml-story-interactive-quiz-option i-amphtml-story-interactive-option bg-light"><span class="i-amphtml-story-interactive-quiz-answer-choice text-primary">B</span><input class="i-amphtml-story-interactive-quiz-option-text w-100 border-0 bg-light" placeholder="Option B" contenteditable=""></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end voting mechanism -->
+                        </div>
+                        <!-- Post End -->
+                        <div class="w-100 d-flex text-dark bg-light m-0 rounded-0">
+                            <input type="file" name="image_1_id" id="image_1_id" class="d-none" onchange="new_post_add_image(this, 1)">
+                            <label for="image_1_id" class="new-post-image-label cursor-pointer col-6 text-center border-right py-2">
+                                    <i class="uil uil-plus"></i> image
+                            </label>
+                            <input type="file" name="image_2_id" id="image_2_id" class="d-none" onchange="new_post_add_image(this, 2)">
+                            <label for="image_2_id" class="new-post-image-label cursor-pointer col-6 text-center border-right py-2 d-none">
+                                    <i class="uil uil-plus"></i> image
+                            </label>
+                            <div onclick="new_post_remove_image()" class="cursor-pointer col-6 text-center border-left border-right py-2">
+                                <i class="uil uil-minus"></i> image
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- section two -->
+                    <div id="section-2" class="d-none">
+                        <div class="px-4 ps-3">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                    <input type="text" name="options" class="d-none">
+                                    <input type="text" name="format" class="d-none">
+                                    <input type="text" name="selected_option" class="d-none">
+                                    {% if current_user.role == "admin" %}
+                                    <div class="mb-3">
+                                        <label class="form-label text-dark">Topic Name </label>
+                                        <div class="form-icon position-relative">
+                                            <input type="text" placeholder="Add the username" class="form-control" name="users-list-tags">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="mb-3 col-6">
+                                            <label class="form-label text-dark">A Votes  </label>
+                                            <div class="form-icon position-relative">
+                                                <input type="number" placeholder="A Votes" class="form-control" name="a_votes">
+                                            </div>
+                                        </div>
+                                        <div class="mb-3 col-6">
+                                            <label class="form-label text-dark">B Votes </label>
+                                            <div class="form-icon position-relative">
+                                                <input type="number" placeholder="B Votes" class="form-control" name="b_votes">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Event End Date </label>
+                                        <div class="form-icon position-relative">
+                                            <input id="event_end_time_input" name="event-end-time-input" type="datetime-local" max="2100-12-31"  class="form-control">
+                                            <input id="event_end_time_timezone" name="event-end-time-timezone" value="" hidden>
+                                            <script>
+                                                var time_now = new Date().toISOString().split("T")[0]
+                                                document.getElementById("event_end_time_input").setAttribute("min", time_now)
+
+                                                var timezone_captured = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                                                document.getElementById("event_end_time_timezone").value = String(timezone_captured);
+                                            </script>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    <div class="mb-3">
+                                        <label class="form-label text-dark">Tags </label>
+                                        <div class="form-icon position-relative">
+                                            <input type="text" placeholder="Add 1-5 tags" class="form-control p-0" name="tags" value="">
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label text-dark">Accessibility </label>
+                                        <div class="form-icon position-relative">
+                                            <textarea rows="4" class="form-control resize-none" placeholder="Alt text to explain the post to the visually impaired" name="accessibility"></textarea>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="d-none" id="discreteSubmit"></button>
+                                </div><!--end col-->
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block footer %}
+<!-- shuffle js -->
+<script src="/js/create-poll.js"></script>
+{% endblock %}

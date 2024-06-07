@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <title>{% block title %}{% endblock %}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <meta name="description" content="{% block description %}{% endblock %}" />
+        <meta name="Version" content="v4.0.2" />
+        <meta name="robots" content="index, follow">
+        <meta name="language" content="English">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+        <meta name="is_logged_in" content="{% if current_user.is_active %}1{% else %}0{% endif %}">
+        <meta name="is_user_registered" content="{% if not session['fingerprint_id'] %}0{% else %}1{% endif %}">
+        <!-- Twitter SEO -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@abpoll" />
+        <!-- Open Graph SEO -->
+        <meta property="og:title" content="{{ self.title() }}" />
+        <meta property="og:description" content="{{ self.description() }}" />
+        <meta property="og:image" content="{% block featured_image %}{% endblock %}">
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="ABpoll">
+        <!-- favicon -->
+        <link rel="shortcut icon" href="/favicon.ico">
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+        <meta name="theme-color" content="#fff">
+        <meta name="msapplication-TileColor" content="#5bbad5">
+        <!-- Web App Manifest -->
+        <link rel="manifest" href="/manifest.json">
+        <!-- Disable cache -->
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+        <meta http-equiv="Pragma" content="no-cache">
+        <meta http-equiv="Expires" content="0">
+        <!-- necessary vendor js -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js" integrity="sha512-pumBsjNRGGqkPzKHndZMaAG+bir374sORyzM3uulLV14lN5LyykqNk8eEeUlUkB3U0M4FApyaHraT65ihJhDpQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.11/jquery.lazy.min.js" integrity="sha512-eviLb3jW7+OaVLz5N3B5F0hpluwkLb8wTXHOTy0CyNaZM5IlShxX1nEbODak/C0k9UdsrWjqIBKOFY0ELCCArw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css" integrity="sha512-SbiR/eusphKoMVVXysTKG/7VseWii+Y3FdHrt0EpKgpToZeemhqHeZeLWLhJutz/2ut2Vw1uQEj2MbRF+TVBUA==" crossorigin="anonymous" referrerpolicy="no-referrer" />        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.bundle.min.js" integrity="sha512-i9cEfJwUwViEPFKdC1enz4ZRGBj8YQo6QByFTF92YXHi7waCqyexvRD75S5NVTsSiTv7rKWqG9Y5eFxmRsOn0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>        <!-- Icons -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/6.5.95/css/materialdesignicons.min.css" integrity="sha512-Zw6ER2h5+Zjtrej6afEKgS8G5kehmDAHYp9M2xf38MPmpUWX39VrYmdGtCrDQbdLQrTnBVT8/gcNhgS4XPgvEg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@iconscout/unicons@3.0.6/css/line.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js" integrity="sha512-7x3zila4t2qNycrtZ31HO0NnJr8kg2VI67YLoRSyi9hGhRN66FHYWr7Axa9Y1J9tGYHVBPqIjSE1ogHrJTz51g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <!-- Css -->
+        <link href="/css/style.css" rel="stylesheet" type="text/css" id="theme-opt" />
+        <link href="/css/abpoll.css" rel="stylesheet" type="text/css">
+        <link href="/css/colors/default.css" rel="stylesheet" id="color-opt">
+        <link href="/css/font/stylesheet.css" rel="stylesheet" type="text/css">
+        <!-- Moment -->
+        {{ moment.include_moment() }}
+        {{ moment.locale(auto_detect=True) }}
+        <!-- Moment END -->
+        {% block header %}
+        {% endblock %}
+        <!-- Analytics JS -->
+        <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
+        <script type="text/javascript" src="/js/analytics.js"></script>
+        <meta name="facebook-domain-verification" content="fk9okd0ejeggs0v8hf92ia8kc2u0ov" />
+        <!-- Sharing -->
+        <link href="https://cdn.jsdelivr.net/npm/shareon@2/dist/shareon.min.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/shareon@2/dist/shareon.iife.js" defer init></script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-264FH0BM28"></script>
+        <!-- Google tag (gtag.js) -->
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-264FH0BM28');
+        </script>
+        <!-- Snap Pixel Code -->
+        <script type='text/javascript'>
+        (function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function()
+        {a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};
+        a.queue=[];var s='script';r=t.createElement(s);r.async=!0;
+        r.src=n;var u=t.getElementsByTagName(s)[0];
+        u.parentNode.insertBefore(r,u);})(window,document,
+        'https://sc-static.net/scevent.min.js');
+
+        snaptr('init', 'fb065e7c-3896-4b1c-8da7-423c996c854a', {
+        {% if current_user.is_active %}
+        'user_email': '{{current_user.email}}'
+        {% endif %}
+        });
+
+
+        snaptr('track', 'PAGE_VIEW');
+
+        </script>
+        <!-- End Snap Pixel Code -->
+    </head>
+
+    <body>
+        {% if current_user.is_active == False %}
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
+        <div id="g_id_onload"
+             data-client_id="{{config.GOOGLE_CLIENT_ID}}"
+             data-callback="handleCredentialResponse">
+        </div>
+        {% endif %}
+        <div class="page-wrapper light-theme toggled {% block page_background %}{% endblock %}">
+            <nav id="sidebar" class="sidebar-wrapper">
+                <div class="sidebar-content" style="height: calc(100% - 60px);">
+                    <div class="sidebar-brand">
+                        <a href="/">
+                            <img src="https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/e217baae-c069-469a-984b-e9291a62f800/public" height="32" class="logo-light-mode" alt="">
+                            <img src="https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/c1e05fcb-72f7-46e4-e0f7-3507310e9700/public" height="32" class="logo-dark-mode" alt="">
+                            <span class="sidebar-colored">
+                                <img src="https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/c1e05fcb-72f7-46e4-e0f7-3507310e9700/public" height="32" alt="">
+                            </span>
+                        </a>
+                    </div>
+
+                    <ul class="sidebar-menu">
+                        <li><a href="/"><i class="mdi mdi-home-outline me-2 rounded-circle"></i>Home</a></li>
+                        <li class="d-block d-md-none"><a href="{{url_for('general.explore')}}"><i class="uil uil-search me-2 rounded-circle"></i>Explore</a></li>
+                        <li><a href="{{url_for('predict.events_page')}}"><i class="uil uil-moon-eclipse me-2 rounded-circle"></i>Predictions</a></li>
+                        <li><a href="{{url_for('groups.index')}}"><i class="uil uil-users-alt me-2 rounded-circle"></i>Groups</a></li>
+
+<!--                        {% if current_user.is_active == False%}-->
+<!--                        <li><a href="{{url_for('user.account_details')}}"><i class="uil uil-analysis me-2 rounded-circle"></i>Insights</a></li>-->
+<!--                        {% elif current_user.subscription %}-->
+<!--                        <li><a href="{{ url_for('analytics.insights') }}" ><i class="uil uil-analysis me-2 rounded-circle"></i>Insights</a></li>-->
+<!--                        {% else %}-->
+<!--                        <li><a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#abpoll-plus-popup"><i class="uil uil-analysis me-2 rounded-circle"></i>Insights <span><i class="mdi mdi-crown text-gold bg-white"></i></span></a></li>-->
+<!--                        {% endif %}-->
+                        <li><a href="{{ url_for('analytics.insights') }}" ><i class="uil uil-analysis me-2 rounded-circle"></i>Insights <span class="badge ms-2 rounded-pill bg-danger"> Beta </span></a></li>
+
+                        <li><a href="{{url_for('message.render_message_html')}}"><i class="uil uil-message me-2 rounded-circle"></i>Messages</a></li>
+                        {% if current_user.is_active %}
+                        <li><a href="{{url_for('post.user_page', username=current_user.username)}}"><i class="uil uil-user me-2 rounded-circle"></i>Profile</a></li>
+                        {% else %}
+                        <li><a href="{{url_for('user.register')}}"><i class="uil uil-user me-2 rounded-circle"></i>Profile</a></li>
+                        {% endif %}
+                    </ul>
+                    <div class="text-center w-100">
+                        <a class="btn btn-primary btn-pills" href="{{ url_for('new_post.upload') }}" style="width: 85%;">New Post</a>
+                    </div>
+                    <!-- sidebar-menu  -->
+                </div>
+
+                <div class="dropup sidebar-footer child-display mb-0 border-top">
+                    <a href="javascript:copy_votes_link()" class="cursor-pointer">
+                        <ul class="sidebar-footer list-unstyled mb-0">
+                            <li class="list-inline-item mb-0">
+                                <span class="btn btn-icon btn-light rounded-circle" style="border: 0 !important;"><i class="uil uil-share-alt"></i></span> <small class="text-dark ms-1">Share Votes</small>
+                            </li>
+                        </ul>
+                    </a>
+                </div>
+                <!-- Sidebar Footer -->
+
+            </nav>
+            <!-- sidebar-wrapper  -->
+
+            <div class="internet-connection-status" id="internetStatus"></div>
+
+            <!-- Start Page Content -->
+            <main class="page-content">
+                <div class="top-header">
+                    <div class="header-bar d-flex justify-content-between border-bottom">
+                        <div class="d-flex align-items-center">
+                            <a href="/" class="logo-icon me-3">
+                                <img src="https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/7b596686-6f9e-4002-9eb1-ee3729ab2000/public" height="32" class="small" alt="">
+                                <span class="big">
+                                    <img src="https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/e217baae-c069-469a-984b-e9291a62f800/public" height="32" class="logo-light-mode" alt="">
+                                    <img src="https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/c1e05fcb-72f7-46e4-e0f7-3507310e9700/public" height="32" class="logo-dark-mode" alt="">
+                                </span>
+                            </a>
+                            <a id="close-sidebar" class="btn btn-icon btn-soft-light rounded-circle" href="javascript:void(0)">
+                                <i class="uil uil-bars"></i>
+                            </a>
+                            <div class="search-bar p-0 d-none d-md-block ms-2">
+                                <div class="menu-search mb-0">
+                                    <form role="search" action="/explore" method="get" class="searchform">
+                                        <div>
+                                            <input type="text" value="{% if request.args.get('s') %}{{ request.args.get('s') }}{% endif %}" class="form-control text-dark bg-soft-secondary rounded-pill border" name="s" placeholder="Search">
+                                            <input type="submit" class="" value="Search">
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <ul class="list-unstyled mb-0">
+                            <li class="list-inline-item mb-0  mt-2 me-2">
+                                <a href="javascript:void(0)">
+                                    <div class="small"><abbr title="These are the points you will use in predictions"><span class="balance me-1 text-muted">{{current_user.coins or session["points"] or 50 }}</span></abbr><i class="uil uil-coins text-success"></i></div>
+                                </a>
+                            </li>
+
+                            {% if current_user.is_active %}
+                            <li class="list-inline-item mb-0">
+                                <a href="{{ url_for('new_post.upload') }}">
+                                    <div class="btn btn-icon btn-soft-light rounded-circle"><i class="uil uil-plus"></i></div>
+                                </a>
+                            </li>
+
+                            <li class="list-inline-item mb-0 ms-1">
+                                <div class="dropdown dropdown-primary">
+                                    <button type="button" onclick="read_notification()" class="btn btn-icon btn-soft-light rounded-circle p-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="uil uil-bell"></i></button>
+                                    <span id="notifications_alert" class="d-none position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
+                                        <span class="visually-hidden">New alerts</span>
+                                    </span>
+
+                                    <div class="dropdown-menu dd-menu bg-white shadow border-0 mt-3 p-0 overflow-auto" style="height: 320px; width: 290px;">
+                                        <div class="d-flex align-items-center justify-content-between p-3 border-bottom" id="number_of_unread">
+                                            <h6 class="mb-0 text-dark">Notifications</h6>
+
+                                        </div>
+                                        <div class="ps-2 py-1" id="notifications-holder">
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <li class="list-inline-item mb-0 ms-1">
+                                <div class="dropdown dropdown-primary">
+                                    <button type="button" class="btn btn-soft-light p-0 rounded-circle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <img src="{{current_user.retrieve_profile_picture()}}" class="avatar avatar-ex-sm rounded-circle" alt="">
+                                    </button>
+                                    <div class="dropdown-menu dd-menu dropdown-menu-end bg-white shadow border-0 mt-3 py-3" style="min-width: 200px;">
+                                        <a class="dropdown-item d-flex align-items-center text-dark pb-3" href="{{url_for('post.user_page', username=current_user.username)}}">
+                                            <img src="{{ current_user.retrieve_profile_picture() }}" class="avatar avatar-md-sm rounded-circle border shadow" alt="{{current_user.display_username()}}'s profile picture">
+                                            <div class="flex-1 ms-2">
+                                                <span class="d-block">{{current_user.display_username()}}</span>
+                                            </div>
+                                        </a>
+                                        <a class="dropdown-item text-dark" href="{{url_for('user.account_details')}}"><span class="mb-0 d-inline-block me-1"><i class="uil uil-setting"></i></span> Settings</a>
+                                        <a class="dropdown-item text-dark" href="{{url_for('helpcenter.help_center')}}"><span class="mb-0 d-inline-block me-1"><i class="uil uil-question-circle"></i></span> Help Center</a>
+                                        <a class="dropdown-item text-dark" href="{{url_for('general.privacy')}}"><span class="mb-0 d-inline-block me-1"><i class="uil uil-shield-check"></i></span> Privacy</a>
+                                        {% if current_user.role == "admin" %}
+                                        <div class="dropdown-divider border-top"></div>
+                                        <a class="dropdown-item text-dark" href="{{url_for('admin.dashboard')}}"><span class="mb-0 d-inline-block me-1"><i class="uil uil-key-skeleton-alt"></i></span> Dashboard</a>
+                                        <a class="dropdown-item text-dark" href="{{url_for('admin.users')}}"><span class="mb-0 d-inline-block me-1"><i class="uil uil-user"></i></span> Users</a>
+                                        <a class="dropdown-item text-dark" href="{{url_for('admin.posts_review')}}"><span class="mb-0 d-inline-block me-1"><i class="uil uil-images"></i></span> Posts</a>
+                                        {% endif %}
+                                        <div class="dropdown-divider border-top"></div>
+                                        <a class="dropdown-item text-dark" href="{{url_for('user.logout')}}"><span class="mb-0 d-inline-block me-1"><i class="uil uil-signout"></i></span> Logout</a>
+                                    </div>
+                                </div>
+                            </li>
+
+                            {% else %}
+                            <li class="list-inline-item">
+                                <a href="{{url_for('user.login')}}" class="btn btn-pills btn-outline-light searchbtn ms-sm-3 ms-0 d-none d-sm-block">Log In</a>
+                            </li>
+
+                            <li class="list-inline-item">
+                                <a href="{{url_for('user.register')}}" class=" btn btn-primary btn-pills ms-1 searchbtn">Sign Up</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+
+                {% block content %}
+                {% endblock %}
+
+
+                <!-- End -->
+            </main>
+            <!--End page-content" -->
+        </div>
+        <!-- page-wrapper -->
+
+        {% if not current_user.is_active and not session['cookie-accepted'] and not session['fingerprint_id'] %}
+        <!-- Cookies Start -->
+<!--        <div class="cookie-popup bg-white shadow rounded py-3 px-4 cookie-popup-not-accepted" style="z-index: 1000;">-->
+<!--            <p class="text-muted mb-0">This website uses cookies to provide you with a great user experience. By using it, you accept our <a href="{{url_for('general.privacy')}}" target="_blank" class="text-success h6">use of cookies</a></p>-->
+<!--            <div class="cookie-popup-actions text-end">-->
+<!--                <button><i class="uil uil-times text-dark fs-4"></i></button>-->
+<!--            </div>-->
+<!--        </div>-->
+        <!-- Cookies End -->
+        {% endif %}
+
+        {% if current_user.is_active and current_user.subscription %}
+        <!-- start abpoll plus modal -->
+        <div class="modal fade" id="abpoll-plus-popup" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog  modal-lg modal-dialog-centered">
+                <div class="modal-content rounded shadow border-0">
+                    <div class="modal-body p-0">
+                        <div class="container-fluid px-0">
+                            <div class="row g-0">
+                                <div class="col-lg-6 col-md-7">
+                                    <!-- start upgrade -->
+                                    <form class="upgrade-form p-4">
+                                        <h4>Upgrade to ABpoll Plus</h4>
+                                        <p class="small text-muted">ABpoll Plus has all the insights you need to understand people better.</p>
+                                        <p class="small small-bold mb-2">Here's what you get with ABpoll Plus.</p>
+                                        <div class="row">
+                                            <div class="col-lg-12 mb-2">
+                                                <div class="d-flex">
+                                                    <i class="mdi mdi-map icon-ex-md text-primary me-2 "></i>
+                                                    <div class="flex-1">
+                                                        <p class="small text-muted mb-0">See all <span class="small small-bold text-dark">15,000</span> votes color coordinated on the map.</p>
+                                                    </div>
+                                                </div>
+                                            </div><!--end col-->
+                                            <div class="col-lg-12 mb-2">
+                                                <div class="d-flex">
+                                                    <i class="mdi mdi-map-marker icon-ex-md text-primary me-2 "></i>
+                                                    <div class="flex-1">
+                                                        <p class="small text-muted mb-0">Click on the map to see more similarities on the location you want.</p>
+                                                    </div>
+                                                </div>
+                                            </div><!--end col-->
+                                            <div class="col-lg-12 mb-4">
+                                                <div class="d-flex">
+                                                    <i class="mdi mdi-chart-box icon-ex-md text-primary me-2 "></i>
+                                                    <div class="flex-1">
+                                                        <p class="small text-muted mb-0">Get detailed analytics on each post and comparisons.</p>
+                                                    </div>
+                                                </div>
+                                            </div><!--end col-->
+
+
+                                            <div class="col-lg-12">
+                                                <div class="d-grid">
+                                                    <a class="btn btn-primary call-to-action btn-pills" href="javascript:subscribeModalUpgrade()">Upgrade</a>
+                                                </div>
+                                            </div><!--end col-->
+
+                                        </div><!--end row-->
+                                    </form>
+                                    <!-- finalize upgrade -->
+                                    <form class="upgrade-form d-none p-4">
+                                        <h4><span onclick="subscribeModalBack()" class="cursor-pointer me-2"><i class="uil uil-angle-left-b"></i></span>Try ABpoll Plus for free</h4>
+                                        <ul class="list-unstyled">
+                                            <li class="mb-1"><span class="h5 me-2"><i class="uil uil-check text-success align-middle"></i></span><span class="small">Free 14 day trial, cancel anytime</span></li>
+                                            <li class="mb-1"><span class="h5 me-2"><i class="uil uil-check text-success align-middle"></i></span><span class="small">We'll remind you before your trial ends</span></li>
+                                        </ul>
+                                        <div class="upgrade-inner-form">
+                                            <div class="custom-control custom-radio custom-control-inline">
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input" onchange="subscribeSelectedPriceChange('119.99')" checked type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+                                                    <label class="form-check-label" for="flexRadioDefault1"><span class="h6">Yearly</span><span class="badge ms-2 rounded-pill btn-sm bg-danger" style="line-height: 10px;">BEST VALUE - SAVE $35.89</span></label><br>
+                                                    <label class="small pt-1 mb-2" for="flexRadioDefault1">$119.99 <span class="text-muted">($9.99/month)</span></label><br>
+                                                </div>
+                                            </div>
+
+                                            <div class="custom-control mt-1 custom-radio custom-control-inline">
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input" onchange="subscribeSelectedPriceChange('12.99')" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
+                                                    <label class="form-check-label" for="flexRadioDefault2"><span class="h6">Monthly</span></label><br>
+                                                    <label class="small pt-1" for="flexRadioDefault2">$12.99</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                           <div class="mt-5 d-flex justify-content-between small text-muted">
+                                                <span>Due {{ moment(time_in_days(14)).format('LL') }}</span>
+                                                <span id="subscribeSelectedPrice">$119.99</span>
+                                            </div>
+                                           <div class="mt-1 d-flex justify-content-between small small-bold">
+                                               <span>Due today <span class="small text-success">(14 days free)</span></span>
+                                                <span>$0.00</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-12 mt-3">
+                                            <div class="d-grid">
+                                                <a class="btn btn-primary call-to-action btn-pills" href="javascript:subscribeModalNext()">Next</a>
+                                            </div>
+                                        </div><!--end col-->
+
+                                    </form>
+                                </div><!--end col-->
+
+                                <div class="col-lg-6 col-md-5 d-none d-md-block">
+                                    <img src="https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/f574d95e-a023-455f-6036-ee536a73e700/gallery" class="img-fluid rounded-end subscribe-img" alt="">
+                                </div><!--end col-->
+
+                            </div><!--end row-->
+                        </div><!--end container-->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end abpoll plus modal -->
+        {% endif %}
+
+        <!-- Comment Modal Content Start -->
+        <div class="modal fade" id="commentModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content rounded shadow border-0">
+                    <div class="modal-header border-0 border-bottom">
+                        <h5 class="modal-title" id="commentModal-title">Comments</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body overflow-auto" style="height: 60vh;">
+                        {% if current_user.is_active %}
+                        <div class="pb-2 mb-2 parent-element">
+                            <div class="d-flex align-items-top">
+                                <span class="pe-3 pt-1">
+                                    <img src="{{current_user.retrieve_profile_picture()}}" class="img-fluid avatar avatar-md-sm rounded-circle shadow" alt="img">
+                                </span>
+                                <div id="commentForm" class="flex-1 commentor-detail text-end pe-2">
+                                    <textarea maxlength="280" style="resize: none;" name="commentInput" placeholder="Add a comment" class="form-control border-0 border-bottom rounded-0 p-0 pt-2 m-0" id="" cols="30" rows="1"></textarea>
+                                    <button onclick="commentFormResetInput()" name="commentInputCancel" class=" d-none btn mt-2 btn-pills btn-sm border-0">Cancel</button>
+                                    <button onclick="commentFormSubmit(this)" name="commentInputSubmit" disabled class="btn d-none mt-2 btn-pills btn-sm btn-primary">Comment</button>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="pb-2 mb-2 parent-element">
+                            <div class="d-flex align-items-top">
+                                <span class="pe-3 pt-1">
+                                    <img src="https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/ddb56a3f-ca16-453b-1adb-7b171d40a900/profile" class="img-fluid avatar avatar-md-sm rounded-circle shadow" alt="img">
+                                </span>
+                                <div id="commentFormRedirect" class="flex-1 commentor-detail text-end pe-2">
+                                    <textarea maxlength="280" style="resize: none;" name="commentFormRedirectInput" placeholder="Add a comment" class="form-control border-0 border-bottom rounded-0 p-0 pt-2 m-0" id="" cols="30" rows="1"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div id="commentContainer">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Comment Modal Content End -->
+
+
+        <!-- Custom Js -->
+        {% block footer %}
+        {% endblock %}
+        <!-- Main Js -->
+        <script src="/js/plugins.init.js"></script>
+        <script src="/js/app.js"></script>
+        <script src="/js/payments.js"></script>
+    </body>
+
+</html>

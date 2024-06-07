@@ -1,0 +1,47 @@
+{% extends 'layouts/base-2.html' %}
+{% import 'macros/form.html' as f with context %}
+
+{% block title %}You are about to cancel your subscription{% endblock %}
+{% block header %}
+<script src="https://js.stripe.com/v2/"></script>
+<script type="module" src="/js/payments-app.js"></script>
+{% endblock %}
+{% block content %}
+<div class="mt-4 d-block d-sm-none">
+	<!-- Spacer -->
+</div>
+<section class="section">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 offset-md-3 card">
+
+        {% call f.form_tag('billing.cancel') %}
+          <h2 class="mt-2 mb-4">Cancel subscription</h2>
+          <p class="lead">
+            <strong>Hi {{ current_user.display_username() }}</strong>,<br/>
+            Before you cancel your account, please read the following:
+          </p>
+          <ul class="mb-5">
+            <li>You will no longer be billed</li>
+            <li>You will lose access to the insights</li>
+            <li>Your account <strong>will</strong> remain open</li>
+            <li>You may subscribe again in the future</li>
+          </ul>
+          <div class="d-flex justify-content-between mb-3">
+              <button type="submit" class="btn btn-primary">
+                <img src="{{ static_url_for('static', filename='images/spinner.gif') }}"
+                     class="spinner"
+                     width="16" height="11" alt="Spinner" style="display: none;"/>
+                Cancel it
+              </button>
+              <a href="{{ url_for('user.account_details') }}"
+                 class="btn btn-outline-secondary">
+                Nevermind
+              </a>
+          </div>
+        {% endcall %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

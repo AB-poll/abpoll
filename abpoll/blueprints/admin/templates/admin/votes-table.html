@@ -1,0 +1,96 @@
+{% import 'macros/items.html' as items %}
+{% extends 'layouts/admin.html' %}
+{% block header %}
+<link href="/css/abpoll.css" rel="stylesheet" type="text/css">
+{% endblock %}
+{% block content %}
+<div class="">
+    <!-- Start Page Content -->
+        <div class="container-fluid">
+            <div class="layout-specing">
+                <div class="d-md-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Votes List</h5>
+                    <!-- SEARCH -->
+                    <div class="widget">
+                        <!-- SEARCH -->
+                        <div class="widget">
+                            <form role="search" method="get">
+                                <div class="input-group border rounded">
+                                    <input type="text" id="poll_id" name="poll_id" class="form-control border-0" placeholder="Search Keywords...">
+                                    <button type="submit" class="input-group-text bg-white border-0" id="searchsubmit"><i class="uil uil-search"></i></button>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- SEARCH -->
+                    </div>
+                    <!-- SEARCH -->
+                </div>
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-danger alert-dismissible fade show mb-0" role="alert">
+                  <strong>Oh snap! </strong> {{message}}.
+                  <abpoll type="abpoll" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></abpoll>
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+
+
+                <div class="row">
+                    <div class="col-12 mt-4">
+                        <div class="table-responsive shadow rounded">
+                            <table class="table table-center bg-white mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="border-bottom p-3" style="min-width: 220px;">Choice Id</th>
+                                        <th class="text-center border-bottom p-3" style="min-width: 200px;">Fingerprint Id</th>
+                                        <th class="text-center border-bottom p-3" style="min-width: 150px;">Timezone</th>
+                                        <th class="text-center border-bottom p-3">City</th>
+                                        <th class="text-center border-bottom p-3">Subdivision</th>
+                                        <th class="text-center border-bottom p-3">Country</th>
+                                        <th class="text-center border-bottom p-3">Continent </th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {% for vote in votes.items %}
+                                    <!-- Start -->
+                                    <tr>
+                                        <td class="text-center p-3">{{vote.user_vote_id}}</td>
+                                        <td class="text-center p-3">{{vote.fingerprint_id}}</td>
+                                        <td class="text-center p-3">{{vote.city}}</td>
+                                        <td class="text-center p-3">{{vote.subdivision}}</td>
+                                        <td class="text-center p-3">{{vote.country}}</td>
+                                        <td class="text-center p-3">{{vote.continent}}</td>
+                                    </tr>
+                                    <!-- End -->
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div><!--end col-->
+                </div><!--end row-->
+
+                <div class="row text-center">
+                    <!-- PAGINATION START -->
+                    <div class="col-12 mt-4">
+                        <div class="d-md-flex align-items-center text-center justify-content-between">
+                            <span class="text-muted me-3">Showing {{votes.items|length}} out of {{votes.total}}</span>
+                            <ul class="pagination mb-0 justify-content-center mt-sm-0">
+                                {{ items.paginate(votes) }}
+<!--                                <li class="page-item"><a class="page-link" href="javascript:void(0)" aria-label="Previous">Prev</a></li>-->
+<!--                                <li class="page-item active"><a class="page-link" href="#">1</a></li>-->
+<!--                                <li class="page-item"><a class="page-link" href="#">2</a></li>-->
+<!--                                <li class="page-item"><a class="page-link" href="#">3</a></li>-->
+<!--                                <li class="page-item"><a class="page-link" href="#" aria-label="Next">Next</a></li>-->
+                             </ul>
+                        </div>
+                    </div><!--end col-->
+                    <!-- PAGINATION END -->
+                </div><!--end row-->
+            </div>
+        </div><!--end container-->
+    <!--End page-content" -->
+</div>
+{% endblock %}

@@ -1,0 +1,208 @@
+{% import 'macros/items.html' as items %}
+{% import 'macros/sidebar.html' as sidebar %}
+{% extends 'layouts/base-2.html' %}
+{% block title %}Groups / ABpoll{% endblock %}
+{% block description %}Create groups and see what your group chooses.{% endblock %}
+{% block featured_image %}https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/939d3f91-fa8b-4d78-fac6-4322c74b1b00/public{% endblock %}
+{% block header %}
+<meta name="keywords" content="online voting, polls, society, likes, groups." />
+<meta name="revisit-after" content="1 days">
+{%endblock %}
+{% block content %}
+<div class="mt-4 d-block d-md-none">
+    <!-- Spacer -->
+</div>
+<!-- Start -->
+<section class="section">
+    <div class="container">
+
+        <div class="row justify-content-center">
+
+            <div class="col-xl-5 col-lg-6 col-md-7 col-sm-12 order-md-2 order-lg-2 order-1">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{category}} fade show m-0 mb-4">{{ message|safe }}</div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+       
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h6 class="ps-1 m-0">Groups</h6>
+                    <a data-bs-target="#CreateGroupForm" data-bs-toggle="modal" class="btn btn-icon btn-primary rounded-circle"><i class="uil uil-plus"></i></a>
+                </div>        
+                {% if groups | length == 0 %}
+                <div class="bg-half-80 bg-light mb-4 rounded">
+                    <h1 class="title d-flex text-primary justify-content-center"><i class="uil uil-layer-group-slash"></i></h1>
+                    <h5 class="title d-flex justify-content-center">No Groups found</h5>
+                    <p class="text-muted text-center">
+                        {% if current_user.is_active %}
+                        You are not yet in any groups but you can create one and share the code with friends
+                        {% else %}
+                        You are not yet in any groups but you can log in to create one
+                        {% endif %}
+                    </p>
+                </div>
+                {% else %}
+                    {% for group in groups %}
+                            <div class="cursor-pointer d-flex p-3 rounded bg-light border-0 my-4 justify-content-between">
+                                <div class="col-4 d-flex align-items-start flex-column">
+                                    <div class="mb-auto">
+                                        <a href="{{url_for('groups.view', group_id=group.id)}}">
+                                        <img src="{{group.background_index() or 'https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/2a3acbc2-d8af-4968-9417-4829c614f600/profile'}}" class="avatar avatar-group-md rounded border shadow" alt="{{group.name}}'s banner">
+                                        </a>
+                                    </div>
+                                    <div class="w-100 text-center mt-2">
+                                        <span onclick='triggerShare({{url_for('groups.view', group_id=group.id, _external=True) | tojson() }}, {{group.name | tojson }}, {{group.description | tojson }})' class="btn text-muted m-0 p-0" title="Share this group">
+                                            <i class="uil uil-share-alt h5"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-8 ps-2 text-muted">
+                                    <a href="{{url_for('groups.view', group_id=group.id)}}">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h5 class="mb-0 text-dark">{{group.name}}</h5>
+                                            <span class="badge rounded-md bg-info p">{{group.number_of_participants()}}<i class="uil uil-user"></i></span>
+                                        </div>
+                                        <p class="text-muted mb-0">{{group.description}}</p>
+                                        <p class="text-muted mt-2 mb-0 small">
+                                            <span class="text-info me-2">Group Code:</span> {{group.clean_spaced_id() }}
+                                        </p>
+                                        {% if group.location %}
+                                        <p class="text-muted mb-0 small">
+                                            <span class="text-info me-2">Location: </span> {{group.location }}
+                                        </p>
+                                        {% endif %}
+                                    </a>
+
+
+                                </div>
+                            </div>
+
+                     {% endfor %}
+                {% endif %}
+
+
+            </div>
+
+            {{ sidebar.users(class_to_add="", how_it_works="Create a group or join a group and see what your group has voted on. This is the best way to know more about each other. You can also try to guess who voted what.", active=current_user.is_active) }}
+
+
+        </div>
+    </div>
+</section>
+
+
+<!-- create group modal start -->
+<div class="modal fade" id="CreateGroupForm" tabindex="-1" aria-labelledby="CreateGroupFormLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded shadow border-0">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="LoginForm-title">Join Group</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-0">
+
+                <form action="javascript:;" onsubmit="return submitJoinGroupId();" id="joinGroupForm" class="needs-validation my-3" novalidate>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <div class="form-group d-flex">
+                        <input name="join" data-group_id="{{ request.args.get('join') }}" id="join_group_id" class="form-control border-0 bg-light" placeholder="Join group" required="">
+                        <button class="btn btn-primary submitBnt btn-pills" id="join_group_submit" disabled type="submit">Join</button>
+                        <div class="invalid-feedback">
+                            Please enter an id
+                        </div>
+                    </div>
+                    <div class="small text-danger mt-1" id="joinGroupForm-feedback"></div>
+                </form>
+                {% if current_user.is_active %}
+                <div class="col-lg-12 my-4 text-center">
+                    <h6 class="text-muted">Or Create Group</h6>
+                </div>
+
+                <form action="{{url_for('groups.create')}}" method="POST" enctype="multipart/form-data" class="needs-validation row" novalidate>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+                    <div class="col-md-6">
+                        <div class="mb-2">
+                            <div class="form-group ">
+                                <label for="join_group_new_name" class="form-label">
+                                Name<span class="text-danger"> *</span>
+                                </label>
+                                <input id="join_group_new_name" class="form-control border-0 bg-light" minlength="3" maxlength="30" name="name" placeholder="Name" required="" type="text" value="">
+                                <div class="invalid-feedback">
+                                    Please enter a short name.
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!--end col-->
+                    <div class="col-md-6">
+                        <div class="mb-2">
+                            <div class="form-group">
+                                <label for="privacy" class="form-label">
+                                Privacy
+                                </label>
+                                <select id="privacy" name="privacy" class="form-select small border-0 bg-light">
+                                    <option value="public" selected>Public</option>
+                                    <option value="private">Private</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end col-->
+                    <div class="col-md-12">
+                        <div class="mb-2">
+                            <label class="form-label">Description <span class="text-danger"> *</span></label>
+                            <div class="form-icon position-relative">
+                                <i data-feather="message-circle" class="fea icon-sm icons"></i>
+                                <textarea name="description" id="validationCustomText" rows="2" maxlength="160" class="form-control ps-5 border-0 bg-light" placeholder="" required=""></textarea>
+                                <div class="invalid-feedback">
+                                    Please enter a short description.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="mb-2">
+                            <div class="form-group ">
+                                <label for="location" class="form-label">
+                                Location
+                                </label>
+                                <input id="location" class="form-control border-0 bg-light" name="location" placeholder="Location " maxlength="45" type="text" value="">
+                            </div>
+                        </div>
+                    </div>
+                    <!--end col-->
+                    <div class="col-md-12">
+                        <div class="my-2">
+
+                            <input type="submit" class="btn w-100 btn-primary searchbtn btn-pills" value="Create"/>
+                        </div>
+                    </div>
+
+                </form>
+                {% else %}
+                <div class="col-lg-12 my-4 text-center">
+                    <h6 class="text-muted">Or login to create one</h6>
+                    <div class="text-center mt-4">
+                        <a href="{{url_for('user.login')}}" class="btn me-2 btn-light searchbtn btn-pills">Login</a>
+                        <a href="{{url_for('user.register')}}" class="btn ms-2 btn-secondary searchbtn btn-pills">Sign up</a>
+                    </div>
+
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
+{% block footer %}
+
+<!-- abpoll js -->
+<script src="/js/abpoll.js"></script>
+{% endblock %}
+

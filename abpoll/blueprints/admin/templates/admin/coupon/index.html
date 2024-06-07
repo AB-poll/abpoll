@@ -1,0 +1,121 @@
+{% extends 'layouts/admin.html' %}
+{% import 'macros/items.html' as items %}
+{% import 'macros/form.html' as f with context %}
+{% import 'billing/macros/billing.html' as billing with context %}
+
+{% block title %}Admin - Coupons / List{% endblock %}
+{% block background_color %}{% endblock %}
+
+{% block content %}
+<div class="container section">
+   <div class="row">
+      <div class="col-md-12">
+         {% with messages = get_flashed_messages(with_categories=true) %}
+         {% if messages %}
+         {% for category, message in messages %}
+         <div class="alert alert-{{category}} fade show m-0">{{ message|safe }}</div>
+         {% endfor %}
+         {% endif %}
+         {% endwith %}
+         <div class="d-flex justify-content-md-between align-items-center">
+            {{ f.search('admin.coupons') }}
+            <a href="{{ url_for('admin.coupons_new') }}"
+               class="btn btn-primary float-right">
+            <i class="uil uil-plus"></i>
+            Create coupon
+            </a>
+         </div>
+         {% if coupons.total == 0 %}
+         <h3>No results found</h3>
+         {% if request.args.get('q') %}
+         <p>Try limiting or removing your search terms.</p>
+         {% else %}
+         <p>
+            There are no coupons present,
+            you should <a href="{{ url_for('admin.coupons_new') }}">create one</a>.
+         </p>
+         {% endif %}
+         {% else %}
+         {% call f.form_tag('admin.coupons_bulk_delete') %}
+         <div class="row align-items-center my-3">
+            <div class="col-lg-8 col-md-7">
+               <div class="section-title">
+                  <h6 class="mb-0">Showing {{coupons.items|length}} of {{coupons.total}} results</h6>
+               </div>
+            </div>
+            <!--end col-->
+            <div class="col-lg-4 col-md-5 mt-4 mt-sm-0 pt-2 pt-sm-0">
+               <div id="bulk_actions" class="d-flex justify-content-md-end align-items-center">
+                  <div class="form custom-form">
+                     <div class="mb-0">
+                        {{ f.field(bulk_form.scope, inline=True, class="form-select form-control") }}
+                     </div>
+                  </div>
+                  <div class="mx-2  ps-2 ms-2">
+                     <button type="submit" class="text-muted btn p-0">
+                     <i class="uil uil-trash"></i>
+                     </button>
+                  </div>
+               </div>
+            </div>
+            <!--end col-->
+         </div>
+         <table class="table table-striped">
+            <thead>
+               <tr>
+                  <th>
+                     <label for="select_all"></label>
+                     <input id="select_all" name="select_all" type="checkbox">
+                  </th>
+                  <th class="js-col-header">
+                     {{ items.sort('created_on', 'Created') }}
+                  </th>
+                  <th class="js-col-header">
+                     {{ items.sort('code') }}
+                  </th>
+                  <th class="js-col-header">
+                     {{ items.sort('duration') }}
+                  </th>
+                  <th class="js-col-header">
+                     {{ items.sort('redeem_by', 'Expires') }}
+                  </th>
+                  <th class="js-col-header">
+                     {{ items.sort('times_redeemed', 'Redeemed') }}
+                  </th>
+               </tr>
+            </thead>
+            <tbody>
+               {% for coupon in coupons.items %}
+               <tr class="{{ 'half-faded' if not coupon.valid }}">
+                  <td>
+                     <label for="bulk_ids"></label>
+                     <input class="js-checkbox-item" id="bulk_ids"
+                        name="bulk_ids" type="checkbox" value="{{ coupon.id }}">
+                  </td>
+                  <td>
+                     <time class="js-from-now"
+                        data-datetime="{{ coupon.created_on }}">
+                     {{ coupon.created_on }}
+                     </time>
+                  </td>
+                  <td>
+                     {{ coupon.code }}
+                     <p class="small text-muted">
+                        {{ billing.coupon_discount(coupon.amount_off, coupon.percent_off) }}
+                        discount
+                     </p>
+                  </td>
+                  <td>{{ billing.coupon_duration_tag_for(coupon) }}</td>
+                  <td>{{ billing.coupon_expiration(coupon) }}</td>
+                  <td>{{ billing.coupon_redeemed(coupon.times_redeemed, coupon.max_redemptions) }}</td>
+               </tr>
+               {% endfor %}
+            </tbody>
+         </table>
+         {% endcall %}
+         {{ items.paginate(coupons) }}
+         {% endif %}
+      </div>
+   </div>
+</div>
+{% endblock %}

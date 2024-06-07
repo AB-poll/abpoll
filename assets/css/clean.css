@@ -1,0 +1,41 @@
+#password-visibility {
+  top: 8.5px;
+  right: 0.625rem;
+  z-index: 10;
+  width: 1.5rem;
+  height: 1.5rem;
+  text-align: center;
+  background-color: transparent;
+  cursor: pointer;
+}
+#password-visibility i {
+  line-height: 1.5rem;
+}
+#password-visibility i.uil-eye-slash {
+  display: none;
+}
+#password-visibility.active i.uil-eye-slash {
+  display: block;
+}
+#password-visibility.active i.uil-eye {
+  display: none;
+}
+
+.password-score,
+.password-recommendation {
+  display: none !important;
+}
+#password-recommendation-heading {
+  font-weight: 700;
+  color: #2ecc4a;
+  font-size: 16px;
+}
+
+/* remove validation icons */
+.form-control.is-invalid, .was-validated .form-control:invalid {
+    background-image: none !important;
+}
+
+.form-control.is-valid, .was-validated .form-control:valid {
+    background-image: none !important;
+}

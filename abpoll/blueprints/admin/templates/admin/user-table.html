@@ -1,0 +1,358 @@
+{% import 'macros/items.html' as items %}
+{% extends 'layouts/admin.html' %}
+{% block header %}
+<link href="/css/abpoll.css" rel="stylesheet" type="text/css">
+{% endblock %}
+{% block content %}
+<div class="">
+    <!-- Start Page Content -->
+        <div class="container-fluid">
+            <div class="layout-specing">
+                <div class="d-md-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Users List</h5>
+                    <!-- SEARCH -->
+                    <div class="widget">
+                        <!-- SEARCH -->
+                        <div class="widget">
+                            <form role="search" method="get">
+                                <div class="input-group border rounded">
+                                    <input type="text" id="s" name="s" class="form-control border-0" placeholder="Search Keywords...">
+                                    <button type="submit" class="input-group-text bg-white border-0" id="searchsubmit"><i class="uil uil-search"></i></button>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- SEARCH -->
+                    </div>
+                    <!-- SEARCH -->
+                </div>
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-danger alert-dismissible fade show mb-0" role="alert">
+                  <strong>Oh snap! </strong> {{message}}.
+                  <abpoll type="abpoll" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></abpoll>
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+
+
+                <div class="row">
+                    <div class="col-12 mt-4">
+                        <div class="table-responsive shadow rounded">
+                            <table class="table table-center bg-white mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="border-bottom p-3" style="min-width: 220px;">Users</th>
+                                        <th class="text-center border-bottom p-3" style="min-width: 200px;">Email</th>
+                                        <th class="text-center border-bottom p-3" style="min-width: 150px;">Sign Up Date</th>
+                                        <th class="text-center border-bottom p-3">Email Status</th>
+                                        <th class="text-end border-bottom p-3" style="min-width: 200px;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for user in users.items if user.role != "admin"%}
+                                    <!-- Start -->
+                                    <tr id="{{user.id}}_object">
+                                        <td class="p-3">
+                                            <a href="/u/{{user.username}}" class="text-dark">
+                                                <div class="d-flex align-items-center">
+                                                    <img src="{{user.retrieve_profile_picture()}}" class="avatar avatar-ex-small rounded-circle shadow" alt="">
+                                                    <span class="ms-2">{{user.username}}</span>
+                                                </div>
+                                            </a>
+                                        </td>
+                                        <td class="text-center p-3">{{user.email}}</td>
+                                        <td class="text-center p-3">{{moment(user.created_on).fromNow()}}</td>
+                                        <td class="text-center p-3">
+                                            {% if user.email_verified %}
+                                            <div class="badge bg-soft-success rounded px-3 py-1">
+                                                Verified
+                                            </div>
+                                            {% else %}
+                                            <div class="badge bg-soft-danger rounded px-3 py-1">
+                                                Pending
+                                            </div>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end p-3">
+                                            <div onclick="ban_user('{{user.id}}')" class="btn btn-sm btn-primary">Ban</div>
+                                            <button
+                                                class="btn btn-sm btn-soft-primary ms-2"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#AdminEditUser"
+                                                data-user_status="{{user.status}}"
+                                                data-user_id="{{user.id}}"
+                                                data-username="{{user.display_username()}}"
+                                                data-description="{{user.description}}"
+                                                data-email="{{user.email}}"
+                                                data-image_1="{{user.profile_picture}}"
+                                                data-social_1_option="{{user.social_1_option}}"
+                                                data-social_1_handle="{{user.social_1_handle}}"
+                                                data-social_2_option="{{user.social_2_option}}"
+                                                data-social_2_handle="{{user.social_2_handle}}"
+                                                data-location="{{user.location}}"
+                                            >Edit</button>
+                                        </td>
+                                    </tr>
+                                    <!-- End -->
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div><!--end col-->
+                </div><!--end row-->
+
+                <div class="row text-center">
+                    <!-- PAGINATION START -->
+                    <div class="col-12 mt-4">
+                        <div class="d-md-flex align-items-center text-center justify-content-between">
+                            <span class="text-muted me-3">Showing {{users.items|length}} out of {{users.total}}</span>
+                            <ul class="pagination mb-0 justify-content-center mt-sm-0">
+                                {{ items.paginate(users) }}
+                             </ul>
+                        </div>
+                    </div><!--end col-->
+                    <!-- PAGINATION END -->
+                </div><!--end row-->
+            </div>
+        </div><!--end container-->
+    <!--End page-content" -->
+</div>
+<!-- page-wrapper -->
+<!-- Modal Content Start -->
+<div class="modal fade" id="AdminEditUser" tabindex="-1" aria-labelledby="AdminEditUser-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded shadow border-0">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="AdminEditUser-title">Edit Post</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{url_for('admin.edit_user')}}" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                <div class="modal-body">
+                    <div class="row">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label">User Id <span class="text-danger">*</span></label>
+                                <div class="form-icon position-relative">
+                                    <input required="" type="text" class="form-control" name="user_id">
+                                </div>
+                            </div>
+                        </div><!--end col-->
+
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label">Status</label>
+                                <div class="form-icon position-relative">
+                                    <select id="user_status" name="user_status" class="form-select form-control col-md-6" aria-label="Default select None">
+                                      <option data-option="visible" value="visible">Visible</option>
+                                      <option data-option="hidden" value="hidden">Hidden</option>
+                                      <option data-option="topic" value="topic">Topic</option>
+                                      <option data-option="banned" value="banned">Banned</option>
+                                      <option data-option="immune" value="immune">Immune</option>
+                                      <option data-option="deleted" value="immune">Deleted</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div><!--end col-->
+
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label">Username <span class="text-danger">*</span></label>
+                                <div class="form-icon position-relative">
+                                    <input required="" type="text" class="form-control" name="username">
+                                </div>
+                            </div>
+                        </div><!--end col-->
+
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <div class="form-icon position-relative">
+                                    <input type="text" class="form-control" name="description">
+                                </div>
+                            </div>
+                        </div><!--end col-->
+
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label">Email <span class="text-danger">*</span></label>
+                                <div class="form-icon position-relative">
+                                    <input type="text" class="form-control" name="email" required="">
+                                </div>
+                            </div>
+                        </div><!--end col-->
+
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label">Image 1 Link<span class="text-danger">*</span></label>
+                                <div class="form-icon position-relative">
+                                    <input type="text" class="form-control" name="image_1_id" required="">
+                                </div>
+                            </div>
+                        </div><!--end col-->
+
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label">Image 1 File</label>
+                                <div class="form-icon position-relative">
+                                    <input type="file" class="form-control" name="image_1_file">
+                                </div>
+                            </div>
+                        </div><!--end col-->
+
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label">Socials</label>
+                                <div class="form-icon position-relative">
+                                    <select id="social_1_option" name="social_1_option" class="form-select form-control col-md-6" aria-label="Default select Twitter">
+                                      <option data-option="Twitter" value="Twitter">Twitter</option>
+                                      <option data-option="Instagram" value="Instagram">Instagram</option>
+                                      <option data-option="Twitch" value="Twitch">Twitch</option>
+                                      <option data-option="Youtube" value="Youtube">Youtube</option>
+                                      <option data-option="Website" value="Website">Website</option>
+                                    </select>
+                                    <input type="text" name="social_1_handle" class="form-control col-md-6" placeholder="">
+                                </div>
+                            </div>
+                        </div><!--end col-->
+
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <div class="form-icon position-relative">
+                                    <select id="social_2_option" name="social_2_option" class="form-select form-control col-md-6" aria-label="Default select Website">
+                                      <option data-option="Twitter" value="Twitter">Twitter</option>
+                                      <option data-option="Instagram" value="Instagram">Instagram</option>
+                                      <option data-option="Twitch" value="Twitch">Twitch</option>
+                                      <option data-option="Youtube" value="Youtube">Youtube</option>
+                                      <option data-option="Website" value="Website">Website</option>
+                                    </select>
+                                    <input maxlength="30" type="text" name="social_2_handle" class="form-control col-md-6">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <label class="form-label">Location</label>
+                                <div class="form-icon position-relative">
+                                    <input type="text" maxlength="30" name="location" class="form-control ps-2">
+                                    <div class="invalid-feedback">
+                                        Please keep the length to 30 characters
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="submit" class="btn btn-primary btn-pills">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal Content End -->
+<script>
+function ban_user(user_id) {
+
+    let csrfToken = $('meta[name=csrf-token]').attr('content');
+    $.ajax({
+        type: "POST",
+        url: "/admin/user/ban",
+        data: {
+            'user_id': user_id,
+        },
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader('X-CSRFToken', csrfToken);
+        },
+        success: function(data) {
+            $('#' + user_id + '_object').remove();
+        },
+        error: function(data) {
+            console.log("error");
+        }
+    });
+
+};
+
+$('#AdminEditUser').on('show.bs.modal', function (e) {
+    document.querySelector('input[name="user_id"]').value = $(e.relatedTarget).data('user_id');
+    document.querySelector('input[name="username"]').value = $(e.relatedTarget).data('username');
+    var description = $(e.relatedTarget).data('description')
+    if (description !== "None"){
+        document.querySelector('input[name="description"]').value = $(e.relatedTarget).data('description');
+    } else {
+        document.querySelector('input[name="description"]').value = "";
+    }
+    document.querySelector('input[name="email"]').value = $(e.relatedTarget).data('email');
+    document.querySelector('input[name="image_1_id"]').value = $(e.relatedTarget).data('image_1');
+
+    var social_1_option = $(e.relatedTarget).data('social_1_option');
+    if (social_1_option === "None" || social_1_option === "twitter"){
+        document.querySelector('select[name="social_1_option"]').selectedIndex = 0;
+    } else if (social_1_option == "instagram"){
+        document.querySelector('select[name="social_1_option"]').selectedIndex = 1;
+    } else if (social_1_option === "twitch"){
+        document.querySelector('select[name="social_1_option"]').selectedIndex = 2;
+    } else if (social_1_option === "youtube"){
+        document.querySelector('select[name="social_1_option"]').selectedIndex = 3;
+    } else {
+        document.querySelector('select[name="social_1_option"]').selectedIndex = 4;
+    };
+
+    social_1_handle = $(e.relatedTarget).data('social_1_handle');
+    if (social_1_handle !== "None"){
+        document.querySelector('input[name="social_1_handle"]').value = social_1_handle;
+    } else {
+        document.querySelector('input[name="social_1_handle"]').value = "";
+    }
+
+    var social_2_option = $(e.relatedTarget).data('social_2_option');
+    if (social_2_option === "None" || social_2_option === "twitter"){
+        document.querySelector('select[name="social_2_option"]').selectedIndex = 0;
+    } else if (social_2_option == "instagram"){
+        document.querySelector('select[name="social_2_option"]').selectedIndex = 1;
+    } else if (social_2_option === "twitch"){
+        document.querySelector('select[name="social_2_option"]').selectedIndex = 2;
+    } else if (social_2_option === "youtube"){
+        document.querySelector('select[name="social_2_option"]').selectedIndex = 3;
+    } else {
+        document.querySelector('select[name="social_2_option"]').selectedIndex = 4;
+    };
+
+    var user_status = $(e.relatedTarget).data('user_status');
+    if (user_status === "None" || user_status === "visible"){
+        document.querySelector('select[name="user_status"]').selectedIndex = 0;
+    } else if (user_status == "hidden"){
+        document.querySelector('select[name="user_status"]').selectedIndex = 1;
+    } else if (user_status == "topic"){
+        document.querySelector('select[name="user_status"]').selectedIndex = 2;
+    } else if (user_status === "banned"){
+        document.querySelector('select[name="user_status"]').selectedIndex = 3;
+    } else if (user_status === "immune"){
+        document.querySelector('select[name="user_status"]').selectedIndex = 4;
+    } else {
+        document.querySelector('select[name="user_status"]').selectedIndex = 5;
+    };
+
+    var social_2_handle = $(e.relatedTarget).data('social_2_handle');
+    if (social_2_handle !== "None"){
+        document.querySelector('input[name="social_2_handle"]').value = social_2_handle;
+    } else {
+        document.querySelector('input[name="social_2_handle"]').value = "";
+    }
+
+    var location = $(e.relatedTarget).data('location');
+    if (location !== "None"){
+        document.querySelector('input[name="location"]').value = location;
+    } else {
+        document.querySelector('input[name="location"]').value = "";
+    }
+})
+
+</script>
+
+{% endblock %}

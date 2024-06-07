@@ -1,0 +1,31 @@
+{% extends 'layouts/base-2.html' %}
+{% import 'billing/macros/billing.html' as billing %}
+
+{% block title %}Billing details and history{% endblock %}
+
+{% block header %}
+<script src="https://js.stripe.com/v2/"></script>
+<script type="module" src="/js/payments-app.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="mt-4 d-block d-sm-none">
+	<!-- Spacer -->
+</div>
+<section class="section">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        {{ billing.subscription_details(coupon) }}
+        {{ billing.upcoming_invoice(upcoming) }}
+        {{ billing.invoices(paginated_invoices) }}
+
+        <hr class="mt-5" />
+        <a href="{{ url_for('user.account_details') }}" class="btn btn-primary btn-pills">
+          Go back to your account
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

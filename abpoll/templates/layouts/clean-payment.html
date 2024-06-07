@@ -1,0 +1,62 @@
+{% extends 'layouts/clean.html' %}
+{% import 'macros/form.html' as f with context %}
+{% import 'billing/macros/billing.html' as billing with context %}
+
+{% block title %}Achieve more with ABpoll Plus{% endblock %}
+{% block description %}ABpoll Plus has all the real time data you need to learn more about the world's needs. No survey necessary: simply sort..{% endblock %}
+{% block header %}
+<script src="https://js.stripe.com/v2/"></script>
+<script type="module" src="/js/payments-app.js"></script>
+<!-- Moment -->
+{{ moment.include_moment() }}
+{{ moment.locale(auto_detect=True) }}
+
+{% endblock %}
+{% block content %}
+<div class="mt-4 d-block d-sm-none">
+	<!-- Spacer -->
+</div>
+<section class="cover-user bg-white">
+  <div class="container-fluid px-0">
+      <div class="row g-0 position-relative">
+          <div class="col-lg-6 padding-less img order-2 d-none d-lg-block" style="background-image: linear-gradient(300deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7)), url(https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/cc9c3830-df27-4c0c-ea1d-887e1bdfbf00/public);" data-jarallax='{"speed": 0.5}'>
+            <div class="m-4 px-4 text-white">
+              <div class="py-4">
+                <a class="logo " href="/">
+                  <img src="/images/logo-light.png" height="36" class="logo-light-mode" alt="">
+                </a> <i class="mdi mdi-crown text-gold"></i>  <span class="small">Plus</span>
+              </div>
+              <div class="mt-4">
+                <h1>Achieve more with ABpoll Plus.</h2>
+                <p>Your superpower for market research.</p>
+              </div>
+              <div class="mt-4">
+                <ul class="list-unstyled">
+                  <li class="mb-1"><span class="text-success h5 me-2"><i class="mdi mdi-check-circle align-middle"></i></span>15,000 responses already pre analyzed for you</li>
+                  <li class="mb-1"><span class="text-success h5 me-2"><i class="mdi mdi-check-circle align-middle"></i></span>10 most popular survey topics pre created</li>
+                  <li class="mb-1"><span class="text-success h5 me-2"><i class="mdi mdi-check-circle align-middle"></i></span>Access to similarity sorting and predictions</li>
+                  <li class="mb-1"><span class="text-success h5 me-2"><i class="mdi mdi-check-circle align-middle"></i></span>Location sorting to learn more about your targeted location</li>
+                </ul>
+              </div>
+            </div>
+
+          </div><!-- end col -->
+
+          <div class="col-lg-6 offset-lg-6 cover-my-30 order-1">
+              <div class="cover-user-img d-flex align-items-center justify-content-center">
+                  <div class="row">
+                      <div class="col-12">
+                          {% block inner_content %}
+                          {% endblock %}
+                      </div>
+                      <!--end col-->
+                  </div><!--end row-->
+              </div> <!-- end about detail -->
+          </div> <!-- end col -->
+      </div><!--end row-->
+  </div><!--end container fluid-->
+</section><!--end section-->
+{% endblock %}
+{% block footer %}
+        <script src="/js/payments.js"></script>
+{% endblock %}

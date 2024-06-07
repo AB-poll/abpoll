@@ -1,0 +1,167 @@
+{% extends 'layouts/base-2.html' %}
+{% block title %}Mail Preferences / ABpoll{% endblock %}
+{% block description %}Change your mailing preferences here.{% endblock %}
+{% block header %}
+<meta name="keywords" content="settings, profile, username, password, email." />
+<meta property="og:image" content="https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/939d3f91-fa8b-4d78-fac6-4322c74b1b00/public" data-addsearch="no_crop">
+<meta name="revisit-after" content="1 days">
+{%endblock %}
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9 col-md-7 order-md-1 order-lg-2 order-1">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{category}} fade show m-0">{{ message|safe }}</div>
+                {% endfor %}
+                <br>
+                {% endif %}
+                {% endwith %}
+                <div class="bg-white" id="settings" aria-labelledby="settings">
+                  <div class="rounded shadow mt-4">
+                    <div class="p-4 border-bottom">
+                      <h5 class="mb-0">Account Notifications :</h5>
+                    </div>
+
+                    <div class="p-4">
+                      <div class="d-flex justify-content-between pb-4">
+                        <p class="mb-0">When someone mentions me</p>
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" value="" id="noti1"/>
+                          <label class="form-check-label" for="noti1"></label>
+                        </div>
+                      </div>
+                      <div class="d-flex justify-content-between py-4 border-top">
+                        <p class="mb-0">When someone follows me</p>
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" value="" checked id="noti2"/>
+                          <label class="form-check-label" for="noti2"></label>
+                        </div>
+                      </div>
+                      <div class="d-flex justify-content-between py-4 border-top">
+                        <p class="mb-0">When shares my activity</p>
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" value="" id="noti3"/>
+                          <label class="form-check-label" for="noti3"></label>
+                        </div>
+                      </div>
+                      <div class="d-flex justify-content-between py-4 border-top">
+                        <p class="mb-0">When someone messages me</p>
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" value="" id="noti4"/>
+                          <label class="form-check-label" for="noti4"></label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="rounded shadow mt-4">
+                    <div class="p-4 border-bottom">
+                      <h5 class="mb-0">Marketing Notifications :</h5>
+                    </div>
+
+                    <div class="p-4">
+                      <div class="d-flex justify-content-between pb-4">
+                        <p class="mb-0">There is a sale or promotion</p>
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" value="" id="noti5"/>
+                          <label class="form-check-label" for="noti5"></label>
+                        </div>
+                      </div>
+                      <div class="d-flex justify-content-between py-4 border-top">
+                        <p class="mb-0">Company news</p>
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" value="" id="noti6"/>
+                          <label class="form-check-label" for="noti6"></label>
+                        </div>
+                      </div>
+                      <div class="d-flex justify-content-between py-4 border-top">
+                        <p class="mb-0">Weekly jobs</p>
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" value="" checked id="noti7"/>
+                          <label class="form-check-label" for="noti7"></label>
+                        </div>
+                      </div>
+                      <div class="d-flex justify-content-between py-4 border-top">
+                        <p class="mb-0">Unsubscribe News</p>
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" value="" checked id="noti8"/>
+                          <label class="form-check-label" for="noti8"></label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="rounded shadow mt-4">
+                    <div class="p-4 border-bottom">
+                      <h5 class="mb-0 text-danger">Delete Account :</h5>
+                    </div>
+                    <div class="p-4">
+                      <p class="mb-0">
+                        Once you delete your account, there is no going back. Please be certain.
+                      </p>
+                      <div class="mt-4">
+                        <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#deletAccountForm"  class="btn btn-danger">Permanently Delete Account</a>
+                      </div>
+                      <!--end col-->
+                    </div>
+                  </div>
+                </div>
+                <!--end tab pane-->
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- delete account popup content start -->
+<div class="modal fade" id="deletAccountForm" tabindex="-1" aria-labelledby="deletAccountForm-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded shadow border-0">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="LoginForm-title">Are you absolutely sure?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="password_verification">
+                <div class="modal-body">
+                    <div class="bg-white rounded box-shadow">
+                        <div class="alert h6 alert-danger" role="alert">Unexpected bad things will happen if you don’t read this!</div>
+                        <p class="mb-2">This action cannot be undone. This will permanently delete the /u/{{current_user.username}} account, votes, comments, polls, likes, and remove all collaborator associations.</p>
+                        <p class="mb-2">Please type bellow your password:</p>
+                        <div class="form-icon position-relative">
+                            <i data-feather="key" class="fea icon-sm icons"></i>
+                            <input type="password" name="password-field" class="form-control ps-5" placeholder="Your password">
+                            <div class="text-danger" id="password_failed"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <input type="submit" onclick="sendPassword()" class="btn btn-primary btn-pills" value="Submit">
+                </div>
+            </div>
+            <div id="opt_verification" class="d-none">
+                <div class="modal-body">
+                    <div class="bg-white rounded box-shadow">
+                        <div class="alert h6 alert-danger" role="alert">Unexpected bad things will happen if you don’t read this!</div>
+                        <p class="mb-2">This action cannot be undone. This will permanently delete the /u/{{current_user.username}} account, votes, comments, polls, likes, and remove all collaborator associations.</p>
+                        <p class="mb-2">A verification code was sent to your email please type that bellow:</p>
+                        <div class="form-icon position-relative">
+                            <i data-feather="key" class="fea icon-sm icons"></i>
+                            <input type="text" name="otp-field" class="form-control ps-5" placeholder="6 digit code">
+                            <div class="text-danger" id="otp_failed"></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <input type="submit" onclick="sendOTP()" class="btn btn-primary btn-pills" value="Submit">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- content end -->
+<div class="mt-4 d-block d-sm-none order-4">
+    <!-- Spacer -->
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,58 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <title>Email from Contact Form</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="New email from {{ctx.first_name}}" />
+        <!-- favicon -->
+        <link rel="shortcut icon" href="static/images/favicon.ico">
+        <!-- Font -->
+        <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700&display=swap" rel="stylesheet">
+        <!-- Main Css -->
+        <!-- <link href="static/css/style.css" rel="stylesheet" type="text/css" /> -->
+    </head>
+
+    <body>
+        <!-- Hero Start -->
+        <div style="margin-top: 50px;">
+            <table cellpadding="0" cellspacing="0" style="font-family: Nunito, sans-serif; font-size: 15px; font-weight: 400; max-width: 600px; border: none; margin: 0 auto; border-radius: 6px; overflow: hidden; background-color: #fff; box-shadow: 0 0 3px rgba(60, 72, 88, 0.15);">
+                <thead>
+                    <tr style="background-color: #2f55d4; padding: 3px 0; border: none; line-height: 68px; text-align: center; color: #fff; font-size: 24px; letter-spacing: 1px;">
+                        <th scope="col"><img src="https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/c1e05fcb-72f7-46e4-e0f7-3507310e9700/logo" height="24" alt="ABpoll logo light"></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td style="padding: 48px 24px 0; color: #161c2d; font-size: 16px; font-weight: 400;">
+                          Name:    {{ctx.first_name}}
+                          <br>
+                          Email:   {{ctx.email}}
+                          <br>
+                          Subject: {{ctx.subject}}
+                          <br>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 0 24px 15px; color: #8492a6;">
+                            <br>
+                            {{ctx.message}}
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td style="padding: 16px 8px; color: #8492a6; background-color: #f8f9fc; text-align: center;">
+                            © <script>document.write(new Date().getFullYear())</script> Rombid.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- Hero End -->
+    </body>
+</html>

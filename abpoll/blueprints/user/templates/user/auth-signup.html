@@ -1,0 +1,132 @@
+{% extends 'layouts/clean.html' %}
+{% import 'macros/form.html' as f with context %}
+{% block title %}Sign up / ABpoll{% endblock %}
+{% block description %}Sign up to ABpoll to use all the platform services.{% endblock %}
+{% block content %}
+<!-- Hero Start -->
+<section class="bg-auth-home d-table w-100">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7 col-md-6 d-none d-md-block d-lg-block">
+                <div class="me-lg-5">
+                    <img src="/images/user/signup.svg" class="img-fluid d-block mx-auto" alt="">
+                </div>
+            </div>
+            <div class="col-lg-5 col-md-6">
+                <div class="card border-0">
+                    <div class="card-body">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{category}} fade show m-0">{{ message|safe }}</div>
+                        {% endfor %}
+                        <br>
+                        {% endif %}
+                        {% endwith %}
+                        {% call f.form_tag('user.register', css_class='login-form mt-4') %}
+                        <h4 class="card-title text-center">Sign Up</h4>
+                        <div class="row">
+                            {% if request.args.get('next') %}
+                            <input type="hidden" name="next" value="{{ request.args.get('next') }}"/>
+                            {% elif next_url %}
+                            <input type="hidden" name="next" value="{{ next_url }}"/>
+                            {% endif %}
+
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    {% call f.form_group(form.username, autocomplete='name', id='txt_username', pattern='^(?=.{4,20}$)(?:[a-zA-Z\d]+(?:(?:\|-|_)[a-zA-Z\d])*)+$', maxlength='30') %} {% endcall %}
+                                    <div id="uname_response"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    {% call f.form_group(form.email, autocomplete='email') %} {% endcall %}
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="psw-input" class="form-label">Password <span class="text-danger">*</span></label>
+
+                                    <div class="form-group text-start mb-3 position-relative">
+                                        <input class="form-control" name="password" id="psw-input" autocomplete="password" minlength="8" maxlength="128" type="password" required>
+                                        <div class="invalid-feedback">
+                                            Please enter a valid password.
+                                        </div>    
+                                        <div class="position-absolute" id="password-visibility"><i class="uil uil-eye"></i><i class="uil uil-eye-slash"></i></div>
+                                    </div>
+                                </div>
+                                <div class="mb-3" id="pswmeter"></div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="terms_check_checkbox" required>
+                                        <label class="form-check-label" for="terms_check_checkbox">By signing up you accept the <a href="{{url_for('general.terms')}}" class="text-primary">terms of use</a>.</label>
+                                    </div>
+                                </div>
+                            </div><!--end col-->
+
+                            <div class="col-md-12">
+                                <div class="d-grid">
+                                    <button class="btn btn-primary btn-pills">Sign Up</button>
+                                </div>
+                            </div><!--end col-->
+
+                            {% if next_argument %}
+                            <!--  social_login -->
+                            <div class="col-lg-12 mt-4 text-center">
+                                <h6>Or sign up with</h6>
+                                <div class="row">
+                                    <div class="col-6 mt-3">
+                                        <div class="d-grid">
+                                            <a href="{{url_for('facebook_login.login_facebook')}}?next={{ next_argument  }}" class="btn btn-light px-0 btn-pills"><i class="mdi mdi-facebook text-primary"></i> Facebook</a>
+                                        </div>
+                                    </div><!--end col-->
+
+                                    <div class="col-6 mt-3">
+                                        <div class="d-grid">
+                                            <a href="{{url_for('google_login.login_google')}}?next={{ next_argument  }}" class="btn btn-light px-0 btn-pills"><i class="mdi mdi-google text-danger"></i> Google</a>
+                                        </div>
+                                    </div><!--end col-->
+                                </div>
+                            </div><!--end col-->
+
+                            <div class="mx-auto">
+                                <p class="mb-0 mt-3"><small class="text-dark me-2">Already have an account?</small> <a href="{{url_for('user.login')}}?next={{ next_argument  }}" class="text-dark fw-bold">Login</a></p>
+                            </div>
+                            {% else %}
+                            <!--  social_login -->
+                            <div class=" col-lg-12 mt-4 text-center">
+                                <h6>Or sign up with</h6>
+                                <div class="row">
+                                    <div class="col-6 mt-3">
+                                        <div class="d-grid">
+                                            <a href="{{url_for('facebook_login.login_facebook')}}" class="btn btn-light px-0 btn-pills"><i class="mdi mdi-facebook text-primary"></i> Facebook</a>
+                                        </div>
+                                    </div><!--end col-->
+
+                                    <div class="col-6 mt-3">
+                                        <div class="d-grid">
+                                            <a href="{{url_for('google_login.login_google')}}" class="btn btn-light px-0 btn-pills"><i class="mdi mdi-google text-danger"></i> Google</a>
+                                        </div>
+                                    </div><!--end col-->
+                                </div>
+                            </div><!--end col-->
+
+                            <div class="mx-auto">
+                                <p class="mb-0 mt-3"><small class="text-dark me-2">Already have an account?</small> <a href="{{url_for('user.login')}}" class="text-dark fw-bold">Login</a></p>
+                            </div>
+                            {% endif %}
+                        </div><!--end row-->
+                    </div>
+
+                    {% endcall %}
+                </div>
+            </div>
+        </div> <!--end col-->
+    </div><!--end row-->
+</section><!--end section-->
+
+<!-- Hero End -->
+{% endblock %}

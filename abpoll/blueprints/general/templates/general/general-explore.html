@@ -1,0 +1,68 @@
+{% import 'macros/items.html' as items %}
+{% import 'macros/sidebar.html' as sidebar %}
+{% import 'macros/post.html' as post_template %}
+{% extends 'layouts/base-2.html' %}
+{% block title %}Explore / ABpoll{% endblock %}
+{% block description %}Explore more posts to learn more about your society today.{% endblock %}
+{% block featured_image %}https://imagedelivery.net/hnHx9kxJyligwC1X9CPssg/939d3f91-fa8b-4d78-fac6-4322c74b1b00/public{% endblock %}
+{% block header %}
+<meta name="keywords" content="online voting, polls, society, likes, this or that, ab testing." />
+<meta name="revisit-after" content="1 days">
+{%endblock %}
+{% block content %}
+<div class="mt-4 d-block d-md-none">
+    <!-- Spacer -->
+</div>
+<!-- Start -->
+<section class="section">
+    <div class="container">
+        <div class="widget pb-2 d-block d-md-none">
+            <!-- SEARCH -->
+            <div class="widget">
+                <form role="search" method="get">
+                    <div class="input-group mb-3 border-0 rounded border">
+                        <input type="text" value="{% if request.args.get('s') %}{{ request.args.get('s') }}{% endif %}" name="s" class="form-control border-0" placeholder="Search">
+                        <button type="submit" class="input-group-text border-0 bg-white"><i class="uil uil-search"></i></button>
+                    </div>
+                </form>
+            </div>
+            <!-- SEARCH -->
+        </div>
+
+        <div class="row justify-content-center">
+
+            <div class="col-xl-5 col-lg-6 col-md-7 col-sm-12 order-md-2 order-lg-2 order-1">
+                {% if products.total == 0 %}
+                <div class="bg-half-80 bg-light mb-4 rounded">
+                    <h1 class="title d-flex text-primary justify-content-center"><i class="uil uil-file-lanscape-slash"></i></h1>
+                    <h5 class="title d-flex justify-content-center">No posts found</h5>
+                    <p class="d-flex justify-content-center text-muted">No posts found matching the query.</p>
+                </div>
+                {% else %}
+
+                <div id="grid" class="row">
+                    {% for post in products.items %}
+                    {{post_template.card(post)}}
+                    {% endfor %}
+                </div><!--end row-->
+                <!-- PAGINATION START -->
+                {{ items.paginate(products) }}
+                <!-- PAGINATION END -->
+                {% endif %}
+
+            </div>
+
+            {{ sidebar.users(class_to_add="", how_it_works="Here you can search for any topic or poll and see the past results and comments.", active=current_user.is_active) }}
+
+        </div>
+    </div>
+</section>
+
+
+{% endblock %}
+{% block footer %}
+
+<!-- abpoll js -->
+<script src="/js/abpoll.js"></script>
+{% endblock %}
+

@@ -1,0 +1,32 @@
+{% extends 'layouts/clean-payment.html' %}
+{% import 'macros/form.html' as f with context %}
+{% import 'billing/macros/billing.html' as billing %}
+
+{% set plan_name = request.args.get('plan', '') %}
+{% set is_create = request.endpoint.endswith('create') %}
+{% if is_create %}
+{% set title = _('Enter credit card') %}
+{% set endpoint = 'billing.create' %}
+{% set button = _('Get your free trial') %}
+{% else %}
+{% set title = _('Update credit card') %}
+{% set endpoint = 'billing.update_payment_method' %}
+{% set button = _('Update payment method') %}
+{% endif %}
+
+{% block inner_content %}
+	{% call f.form_tag(endpoint, fid='payment_form') %}
+	<h2 class="mb-4">
+		{% if is_create %}
+		<h4><a href="{{url_for('billing.pricing')}}" class="text-dark me-2"><i class="uil uil-angle-left-b"></i></a> Try ABpoll Plus for free</h4>
+		<ul class="list-unstyled">
+			<li class="mb-1"><span class="h5 me-2"><i class="uil uil-check text-success align-middle"></i></span><span class="small">Free 14 day trial, cancel anytime</span></li>
+			<li class="mb-1"><span class="h5 me-2"><i class="uil uil-check text-success align-middle"></i></span><span class="small">We'll remind you before your trial ends</span></li>
+		</ul>
+		{% else %}
+		{{ title }}
+		{% endif %}
+	</h2>
+	{{ billing.payment_form(form, button, is_create, plan) }}
+	{% endcall %}
+{% endblock %}

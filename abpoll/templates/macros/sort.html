@@ -1,0 +1,55 @@
+{# Render sorted polls. #}
+{% macro render_sort(fingerprints, posts, User) %}
+{% for post in posts if post.post_format != 'Trivia' %}
+{% set a_votes_count = post.sorted_a_votes(fingerprints) %}
+{% set b_votes_count = post.sorted_b_votes(fingerprints) %}
+{% set total_votes_count = a_votes_count + b_votes_count %}
+{% if total_votes_count == 0 %}
+{% set a_votes_percentage = 0 %}
+{% set b_votes_percentage = 0 %}
+{% else %}
+{% set a_votes_percentage = (a_votes_count / total_votes_count)* 100 %}
+{% set b_votes_percentage = (b_votes_count / total_votes_count)* 100 %}
+{% endif %}
+<div class="col-12 spacing picture-item">
+    <div class="card border-0 work-container position-relative d-block overflow-hidden rounded rounded-0">
+        <div class="card-body p-0">
+            <a href="{{url_for('post.post_page', post_id=post.id)}}">
+                <img src="{{post.serve_portrait_image()}}" class="img-fluid w-100 lazy" alt="work-image">
+            </a>
+             <!-- voting mechanism -->
+            <div class="position-absolute {% if post.image_2 == None %}top-75{% else %}top-50{% endif %} start-50 translate-middle w-60">
+                <h1 class="amp-poll-title w-100 text-center m-0 fst-normal fs-4 lh-sm fw-bolder">{{post.title}}</h1>
+                <div id="{{post.id}}" class="i-amphtml-story-poll-quad blue-dark i-amphtml-story-poll-responded" data-total="{{total_votes_count}}">
+                    <span style="--percentage:{{a_votes_percentage}}%;" class="i-amphtml-story-poll-option bg-light mt-2 btn btn-pills btn-vote border-0" data-current="{{a_votes_count}}" data-option="a">
+                        <span class="i-amphtml-story-poll-option-title text-truncate">{{post.a_text}}</span>
+                        <span class="i-amphtml-story-poll-option-percentage">{{a_votes_percentage |round|int}}%</span>
+                    </span>
+                    <span style="--percentage:{{b_votes_percentage}}%;" class="i-amphtml-story-poll-option bg-light mt-2 btn btn-pills btn-vote border-0" data-current="{{b_votes_count}}" data-option="b">
+                        <span class="i-amphtml-story-poll-option-title text-truncate">{{post.b_text}}</span>
+                        <span class="i-amphtml-story-poll-option-percentage">{{b_votes_percentage  |round|int}}%</span>
+                    </span>
+                </div>
+            </div>
+            <!-- end Voting mechanism -->
+        </div>
+    </div>
+    {% if User.status != 'hidden' or current_user.is_active %}
+        <div class="post-meta d-flex justify-content-between text-muted p-2">
+            <ul class="list-unstyled mb-0">
+                <li class="list-inline-item me-2 mb-0">
+                    <i class="uil uil-check"></i> <span class="total-votes">{{total_votes_count}}</span>
+                </li>
+                <li class="list-inline-item">
+                    <a href="{{url_for('post.post_page', post_id=post.id)}}" class="text-muted comments">
+                        <i class="uil uil-comment"></i> <span class="total-comments">{{post.post_comments | length}}</span>
+                    </a>
+                </li>
+            </ul>
+            <a onclick='triggerShare({{url_for('post.post_page', post_id=post.id, _external=True) | tojson}}, {{post.title | tojson }}, "")' class="text-muted cursor-pointer"><i class="uil uil-share-alt"></i></a>
+        </div>
+    {% endif %}
+
+</div><!--end col-->
+{% endfor %}
+{%- endmacro %}

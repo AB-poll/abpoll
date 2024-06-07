@@ -1,0 +1,6 @@
+[{
+        "relation": ["delegate_permission/common.handle_all_urls"],
+        "target" : { "namespace": "android_app", "package_name": "com.abpoll.twa",
+                     "sha256_cert_fingerprints": ["6B:EE:CE:E3:02:97:B5:52:93:E9:8C:F8:C9:BD:28:04:A6:23:8B:9B:D2:39:B8:7F:56:6C:2C:02:CE:60:DA:5E"] }
+      }
+]
