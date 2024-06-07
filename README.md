@@ -4,17 +4,40 @@
 
 ## Table of contents
 
+- [Table of contents](#table-of-contents)
 - [Tech stack](#tech-stack)
+  - [Back-end](#back-end)
+  - [Front-end](#front-end)
+    - [But what about JavaScript?!](#but-what-about-javascript)
 - [Notable opinions and extensions](#notable-opinions-and-extensions)
 - [Running this app](#running-this-app)
+    - [Clone this repo anywhere we want and move into the directory:](#clone-this-repo-anywhere-we-want-and-move-into-the-directory)
+    - [Copy a few example files because the real files are git ignored:](#copy-a-few-example-files-because-the-real-files-are-git-ignored)
+    - [Build everything:](#build-everything)
+    - [Setup the initial database:](#setup-the-initial-database)
+    - [Check it out in a browser:](#check-it-out-in-a-browser)
+    - [Linting the code base:](#linting-the-code-base)
+    - [Formatting the code base:](#formatting-the-code-base)
+    - [Running the test suite:](#running-the-test-suite)
+    - [Stopping everything:](#stopping-everything)
 - [Files of interest](#files-of-interest)
   - [`.env`](#env)
   - [`run`](#run)
+- [CLI Commands](#cli-commands)
+  - [Creating CLI Commands](#creating-cli-commands)
+- [Running CLI Commands](#running-cli-commands)
+  - [Notable CLI Commands](#notable-cli-commands)
 - [Running a script to automate renaming the project](#running-a-script-to-automate-renaming-the-project)
+    - [Start and setup the project:](#start-and-setup-the-project)
+    - [Sanity check to make sure the tests still pass:](#sanity-check-to-make-sure-the-tests-still-pass)
 - [Updating dependencies](#updating-dependencies)
+    - [In development:](#in-development)
+    - [In CI:](#in-ci)
+    - [In production:](#in-production)
 - [See a way to improve something?](#see-a-way-to-improve-something)
 - [Additional resources](#additional-resources)
   - [Learn more about Docker and Flask](#learn-more-about-docker-and-flask)
+    - [Official documentation](#official-documentation)
   - [Deploy to production](#deploy-to-production)
 - [About the author](#about-the-author)
 
@@ -116,7 +139,7 @@ these commands for PowerShell if we want.
 #### Clone this repo anywhere we want and move into the directory:
 
 ```sh
-git clone https://github.com/AB-poll/abpoll-flask abpoll
+git clone https://github.com/AB-poll/abpoll abpoll
 cd abpoll
 
 # Optionally checkout a specific tag, such as: git checkout 0.8.0
@@ -125,7 +148,7 @@ cd abpoll
 #### Copy a few example files because the real files are git ignored:
 
 ```sh
-cp .env.example .env
+cp env.example .env
 cp docker-compose.override.yml.example docker-compose.override.yml
 ```
 
